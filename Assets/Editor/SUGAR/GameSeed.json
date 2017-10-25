@@ -1,0 +1,96 @@
+{
+  "game": "Dodgeball",
+  "achievements": [
+    {
+      "Token": "100_seconds",
+      "GameId": null,
+      "Name": "All The Balls",
+      "Description": "Last 100 Seconds",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "time",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Latest",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "100"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Token": "10_minutes",
+      "GameId": null,
+      "Name": "10 Minutes",
+      "Description": "Play for a total of 10 minutes",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "time",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Sum",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "600"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "600"
+        }
+      ]
+    },
+    {
+      "Token": "free_coins",
+      "GameId": null,
+      "Name": "You're Awesome",
+      "Description": "Free Coins",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "time",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Latest",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "1"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "1000000"
+        }
+      ]
+    }
+  ],
+  "leaderboards": [
+    {
+      "Token": "longest_time",
+      "GameId": null,
+      "Name": "Duration",
+      "EvaluationDataCategory": "GameData",
+      "Key": "time",
+      "ActorType": "User",
+      "EvaluationDataType": "Float",
+      "CriteriaScope": "Actor",
+      "LeaderboardType": "Highest"
+    }
+  ]
+}
