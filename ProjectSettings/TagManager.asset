@@ -17,6 +17,7 @@ TagManager:
   - DodgeBall
   - Rankings
   - DBGenerator
+  - Scale
   layers:
   - Default
   - TransparentFX
