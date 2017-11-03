@@ -12,7 +12,7 @@ public class PlayerController : NetworkBehaviour
 	public string Name;
 	public GameObject[] Stripes = new GameObject[2];
 	public Material[] Materials = new Material[5];
-	public int Invincibility;
+	public int Invincibility, Health, State;
 	
 	private int _blinkCounter;
 	private float _x,  _y, _z;
@@ -36,12 +36,14 @@ public class PlayerController : NetworkBehaviour
 		InGame = false;
 		Server = false;
 		Client = false;
+		State = 0;
 		Name = "";
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
+		Health = Hearts.GetComponent<HeartController>().Health;
 		transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z - 2.0f);
 		transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
@@ -151,6 +153,7 @@ public class PlayerController : NetworkBehaviour
 		transform.localPosition = new Vector3(_initialPosition.x, _initialPosition.y, _initialPosition.z);
 		Hearts.GetComponent<HeartController>().Health = 5;
 		InGame = false;
+		State = 0;
 	}
 
 	//If invincible switch material
@@ -202,21 +205,22 @@ public class PlayerController : NetworkBehaviour
 				_x += Speed / 10;
 			}
 		}
-		Debug.Log(transform.GetComponent<Rigidbody>().velocity);
 		transform.GetComponent<Rigidbody>().velocity = new Vector3(_x, _y, _z);
 	}
 
 	//If this player isn't in this turn move them off screen
 	void OutOfTheWay()
 	{
-		if (Hearts.GetComponent<HeartController>().Health == 0)
+		if (Health == 0 && State == 0)
 		{
 			transform.localPosition = new Vector3(400.0f, 0.0f, 0.0f);
+			State = 1;
 		}
-		if (Controller.GetComponent<Controller>().Started == true && !InGame)
+		if (Controller.GetComponent<Controller>().Started == true && !InGame && State == 1)
 		{
 			transform.localPosition = new Vector3(30.0f, 0.0f, 0.0f);
 			Hearts.GetComponent<HeartController>().Health = 0;
+			State = 2;
 		}
 	}
 

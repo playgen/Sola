@@ -15,7 +15,7 @@ public class Controller : NetworkBehaviour
 	public int[] Positions;
 
 	NetworkManager _networkManager;
-	GameObject _networkManagerGO, _background;
+	GameObject _networkManagerGO, _background, _player;
 	float _materialCounter, _time, _oldTime;
 	bool _waiting, _loggedIn, _running;
 
@@ -68,6 +68,10 @@ public class Controller : NetworkBehaviour
 		if (_running)
 		{
 			Run();
+		}
+		if (Input.GetKeyDown(KeyCode.K))
+		{
+			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
 		}
 	}
 
@@ -137,6 +141,10 @@ public class Controller : NetworkBehaviour
 					GameObject hearts = p.GetComponent<PlayerController>().Hearts;
 					hearts.transform.localPosition = Vector3.zero;
 					p.GetComponent<PlayerController>().SetColour();
+					if (p.GetComponent<PlayerController>().Client || p.GetComponent<PlayerController>().Server)
+					{
+						_player = p;
+					}
 				}
 				foreach (Transform child in Dots.transform)
 				{
@@ -252,10 +260,22 @@ public class Controller : NetworkBehaviour
 		bool gameOver = true;
 		for (int z = 0; z < Players.Length; z++)
 		{
-			if (Players[Positions[z]].GetComponent<PlayerController>().Hearts.GetComponent<HeartController>().Health != 0)
+			if (Players[Positions[z]].GetComponent<PlayerController>().Health != 0)
 			{
 				gameOver = false;
 			}
+		}
+		if (_player.GetComponent<PlayerController>().State == 1)
+		{
+			if (SUGARManager.CurrentUser != null)
+			{
+				SUGARManager.Resource.AddResource("too", (long) ((int) _oldTime), success =>
+				{
+					Debug.Log(success);
+				});
+				SUGARManager.GameData.Send("longest_time", _oldTime);
+			}
+			_player.GetComponent<PlayerController>().State = 2;
 		}
 		if (gameOver && Server)
 		{

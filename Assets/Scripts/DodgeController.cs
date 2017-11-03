@@ -211,18 +211,25 @@ public class DodgeController : MonoBehaviour
 		_angles = new float[Players.Length];
 		for (int i = 0; i < Players.Length; i++)
 		{
-			if (Players[i].transform.position.x - transform.position.x >= 0.0f)
+			if (Players[i].GetComponent<PlayerController>().Health > 0)
 			{
-				_angles[i] = 90 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
+				if (Players[i].transform.position.x - transform.position.x >= 0.0f)
+				{
+					_angles[i] = 90 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
+				}
+				else
+				{
+					_angles[i] = 270 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
+				}
+				_angles[i] = 180.0f - _angles[i];
+				while (_angles[i] < 0.0f)
+				{
+					_angles[i] += 360.0f;
+				}
 			}
 			else
 			{
-				_angles[i] = 270 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
-			}
-			_angles[i] = 180.0f - _angles[i];
-			while (_angles[i] < 0.0f)
-			{
-				_angles[i] += 360.0f;
+				_angles[i] = 1000.0f;
 			}
 		}
 		_secondAngle = Parent.transform.localEulerAngles.z;

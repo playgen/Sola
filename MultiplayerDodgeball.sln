@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerDodgeball", "MultiplayerDodgeball.csproj", "{A8846AE2-0C38-2A11-8F86-490C0291AE1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerDodgeball.Editor", "MultiplayerDodgeball.Editor.csproj", "{43677EED-F878-06F3-4C80-C4AD5F728595}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,10 +13,6 @@ Global
 		{A8846AE2-0C38-2A11-8F86-490C0291AE1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8846AE2-0C38-2A11-8F86-490C0291AE1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8846AE2-0C38-2A11-8F86-490C0291AE1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{43677EED-F878-06F3-4C80-C4AD5F728595}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{43677EED-F878-06F3-4C80-C4AD5F728595}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{43677EED-F878-06F3-4C80-C4AD5F728595}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{43677EED-F878-06F3-4C80-C4AD5F728595}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
