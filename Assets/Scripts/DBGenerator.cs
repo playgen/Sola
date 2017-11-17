@@ -26,26 +26,29 @@ public class DBGenerator : MonoBehaviour {
 	void FixedUpdate ()
 	{
 		//Create one dodgeball
-		if (Pulse)
+		if (Counter < Dodgeballs.Length - 1)
 		{
-			GameObject dodge = (GameObject)Instantiate(Dodgeball);
-			dodge.GetComponentInChildren<DodgeController>().BallNumber = Counter;
-			dodge.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
-			Dodgeballs[Counter] = dodge;
-			Counter++;
-			Pulse = false;
-		}
-		//Create five dodgeball
-		if (PulseFive)
-		{
-			for(int i = 0; i < 5; i++)
+			if (Pulse)
 			{
 				GameObject dodge = (GameObject)Instantiate(Dodgeball);
 				dodge.GetComponentInChildren<DodgeController>().BallNumber = Counter;
 				dodge.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
 				Dodgeballs[Counter] = dodge;
 				Counter++;
-				PulseFive = false;
+				Pulse = false;
+			}
+			//Create five dodgeball
+			if (PulseFive)
+			{
+				for (int i = 0; i < 5; i++)
+				{
+					GameObject dodge = (GameObject)Instantiate(Dodgeball);
+					dodge.GetComponentInChildren<DodgeController>().BallNumber = Counter;
+					dodge.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
+					Dodgeballs[Counter] = dodge;
+					Counter++;
+					PulseFive = false;
+				}
 			}
 		}
 		//Update each dodgeball from the info sent by the server

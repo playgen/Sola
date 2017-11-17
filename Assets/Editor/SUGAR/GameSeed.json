@@ -22,7 +22,7 @@
         {
           "EvaluationDataKey": "coins",
           "EvaluationDataCategory": "Resource",
-          "EvaluationDataType": "Float",
+          "EvaluationDataType": "Long",
           "Value": "1000"
         }
       ]
@@ -48,7 +48,7 @@
         {
           "EvaluationDataKey": "coins",
           "EvaluationDataCategory": "Resource",
-          "EvaluationDataType": "Float",
+          "EvaluationDataType": "Long",
           "Value": "600"
         }
       ]
@@ -74,7 +74,7 @@
         {
           "EvaluationDataKey": "coins",
           "EvaluationDataCategory": "Resource",
-          "EvaluationDataType": "Float",
+          "EvaluationDataType": "Long",
           "Value": "1000000"
         }
       ]

@@ -170,10 +170,10 @@ GameObject:
   - component: {fileID: 33944266978538016}
   - component: {fileID: 23124825506157594}
   - component: {fileID: 54406114700092336}
-  - component: {fileID: 136120926127986860}
   - component: {fileID: 114389231459081968}
   - component: {fileID: 114788405444113522}
   - component: {fileID: 114208217406687180}
+  - component: {fileID: 135636801606185108}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -525,6 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: 30
   Hearts: {fileID: 1155911826207756}
+  Controller: {fileID: 0}
   Server: 0
   Client: 0
   InGame: 0
@@ -540,6 +541,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 0a7726ed1e5d3554bb70246f7c8f4998, type: 2}
   - {fileID: 2100000, guid: bff5025edbac09d4691dcbfb966b224e, type: 2}
   Invincibility: 0
+  Health: 0
+  State: 0
 --- !u!114 &114788405444113522
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -596,6 +599,18 @@ MonoBehaviour:
   Marker: {fileID: 1802107444810568}
   Health: 5
   Place: 0
+--- !u!135 &135636801606185108
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1991596580796426}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &135988388329693248
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -607,19 +622,6 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136120926127986860
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1991596580796426}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 24
-  m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!212 &212226955707676958
 SpriteRenderer:

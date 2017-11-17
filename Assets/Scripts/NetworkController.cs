@@ -152,7 +152,7 @@ public class NetworkController : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcDodge(bool five)
 	{
-		if(five)
+		if (five)
 		{
 			GameObject.FindGameObjectWithTag("DBGenerator").GetComponent<DBGenerator>().PulseFive = true;
 		}

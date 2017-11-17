@@ -18,6 +18,8 @@ TagManager:
   - Rankings
   - DBGenerator
   - Scale
+  - Shop
+  - DBSGenerator
   layers:
   - Default
   - TransparentFX

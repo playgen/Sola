@@ -91,8 +91,32 @@
     <Reference Include="Facebook.Unity.Settings">
       <HintPath>Library\FacebookSDK\Facebook.Unity.Settings.dll</HintPath>
     </Reference>
-    <Reference Include="PlayGen.SUGAR.Unity.WebGL">
-      <HintPath>Assets\SUGAR\Plugins\WebGL\bin\net35\PlayGen.SUGAR.Unity.WebGL.dll</HintPath>
+    <Reference Include="CommandLine">
+      <HintPath>Assets\SUGAR\bin\net35\CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Assets\SUGAR\bin\net35\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.SUGAR.Client">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.SUGAR.Common">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.SUGAR.Contracts">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.SUGAR.Unity">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.SUGAR.Unity.Editor">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Unity.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.Unity.Utilities.Loading">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.Unity.Utilities.Loading.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayGen.Unity.Utilities.Localization">
+      <HintPath>Assets\SUGAR\bin\net35\PlayGen.Unity.Utilities.Localization.dll</HintPath>
     </Reference>
     <Reference Include="PlayGen.Unity.Utilities.BestFit">
       <HintPath>Assets\SUGAR\Utilities\PlayGen.Unity.Utilities.BestFit.dll</HintPath>
@@ -100,32 +124,8 @@
     <Reference Include="PlayGen.Unity.Utilities.FormKeyboardControls">
       <HintPath>Assets\SUGAR\Utilities\PlayGen.Unity.Utilities.FormKeyboardControls.dll</HintPath>
     </Reference>
-    <Reference Include="PlayGen.Unity.Utilities.Loading">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.Unity.Utilities.Loading.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.SUGAR.Unity.Editor">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Unity.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.SUGAR.Client">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.SUGAR.Contracts">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.Unity.Utilities.Localization">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.Unity.Utilities.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.SUGAR.Common">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayGen.SUGAR.Unity">
-      <HintPath>Assets\SUGAR\bin\net35\PlayGen.SUGAR.Unity.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Assets\SUGAR\bin\net35\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="CommandLine">
-      <HintPath>Assets\SUGAR\bin\net35\CommandLine.dll</HintPath>
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <HintPath>Assets\SUGAR\bin\net35\System.ComponentModel.DataAnnotations.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +143,7 @@
     <Compile Include="Assets\SUGAR\Example\Scripts\LeaderboardPositionInterface.cs" />
     <Compile Include="Assets\SUGAR\Example\Scripts\TestImplementation.cs" />
     <Compile Include="Assets\SUGAR\Example\Scripts\UserGroupInterface.cs" />
+    <Compile Include="Assets\Scripts\ButtonController.cs" />
     <Compile Include="Assets\Scripts\Controller.cs" />
     <Compile Include="Assets\Scripts\DBGenerator.cs" />
     <Compile Include="Assets\Scripts\DodgeController.cs" />
@@ -151,6 +152,11 @@
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\ScaleController.cs" />
     <Compile Include="Assets\Scripts\ScrollController.cs" />
+    <Compile Include="Assets\Scripts\ShopControllers.cs" />
+    <Compile Include="Assets\Scripts\SingleController.cs" />
+    <Compile Include="Assets\Scripts\TitleScreenController.cs" />
+    <Compile Include="Assets\Scripts\Upgrade.cs" />
+    <Compile Include="Assets\Scripts\UpgradeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SUGAR\bin\net35\link.xml" />

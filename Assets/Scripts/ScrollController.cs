@@ -4,28 +4,48 @@ using UnityEngine;
 
 public class ScrollController : MonoBehaviour {
 
-	public float Direction;
+	public float Direction, Distance;
+	public bool Rotate;
 
 	// Use this for initialization
 	void Start ()
 	{
-		if(Direction < 0.0f)
+		if (Rotate)
 		{
-			transform.localPosition = new Vector3(13.0f, transform.localPosition.y, 0.0f);
+			transform.localEulerAngles = new Vector3(Direction, 0.0f, 90.0f);
 		}
 		else
 		{
-			transform.localPosition = new Vector3(-13.0f, transform.localPosition.y, 0.0f);
+			if (Direction < 0.0f)
+			{
+				transform.localPosition = new Vector3(Distance, transform.localPosition.y, 0.0f);
+			}
+			else
+			{
+				transform.localPosition = new Vector3(-Distance, transform.localPosition.y, 0.0f);
+			}
 		}
 	}
 	
 	// Scroll across the screen in the desired direction
 	void FixedUpdate ()
 	{
-		transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, 0.0f);
-		if(transform.localPosition.x > 13.0f || transform.localPosition.x < -13.0f)
+		if (Rotate)
 		{
-			transform.localPosition = new Vector3(-transform.localPosition.x, transform.localPosition.y, 0.0f);
+			transform.localEulerAngles = new Vector3(Direction, 0.0f, 90.0f);
+			Direction = Direction + 0.3f;
+			if(Direction >= 360.0f)
+			{
+				Direction = 0.0f;
+			}
+		}
+		else
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, 0.0f);
+			if (transform.localPosition.x > Distance || transform.localPosition.x < -Distance)
+			{
+				transform.localPosition = new Vector3(-transform.localPosition.x, transform.localPosition.y, 0.0f);
+			}
 		}
 	}
 }

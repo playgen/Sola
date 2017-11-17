@@ -31,7 +31,14 @@ public class DodgeController : MonoBehaviour
 		transform.GetComponent<Renderer>().material = Materials[(int)MaterialNum];
 		Arrow.GetComponent<SpriteRenderer>().sprite = Sprites[(int)ArrowNum];
 		_controller = GameObject.FindGameObjectWithTag("Controller");
-		_dbGenerator = GameObject.FindGameObjectWithTag("DBGenerator");
+		if(_controller.GetComponent<Controller>().SinglePlayer)
+		{
+			_dbGenerator = GameObject.FindGameObjectWithTag("DBSGenerator");
+		}
+		else
+		{
+			_dbGenerator = GameObject.FindGameObjectWithTag("DBGenerator");
+		}
 		_hit = false;
 		State = -1;
 		_counter = 0;
@@ -92,7 +99,7 @@ public class DodgeController : MonoBehaviour
 			}
 		}
 		//If the ball is facing a player and it has spawned but not yet been fired then fire
-		if (inArray && State == 0 && _fireTime == 0 && _controller.GetComponent<Controller>().Started && _server)
+		if (inArray && State == 0 && _fireTime == 0 && _controller.GetComponent<Controller>().Started && (_server || _controller.GetComponent<Controller>().SinglePlayer))
 		{
 			State = 1;
 		}
@@ -172,7 +179,7 @@ public class DodgeController : MonoBehaviour
 		{
 			_hit = true;
 		}
-		if (State != 0 && other.tag == "OuterWall" && _server)
+		if (State != 0 && other.tag == "OuterWall" && (_server || _controller.GetComponent<Controller>().SinglePlayer))
 		{
 			_varRandom = Random.Range(0.0f, 1.0f);
 			Speed = 10 + _varRandom * 10.0f;
@@ -182,7 +189,7 @@ public class DodgeController : MonoBehaviour
 			MaterialNum = Random.Range(0, 7);
 			transform.GetComponent<Renderer>().material = Materials[(int) MaterialNum];
 			Arrow.GetComponent<SpriteRenderer>().sprite = Sprites[(int)ArrowNum];
-			_countDown = (int)Random.Range(30, 70);
+			_countDown = Random.Range(30, 70);
 			GetComponent<MeshRenderer>().enabled = false;
 		}
 	}

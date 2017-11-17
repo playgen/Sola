@@ -50,7 +50,7 @@ public class PlayerController : NetworkBehaviour
 		Invinc();
 		OutOfTheWay();
 
-		if (!isLocalPlayer)
+		if (!isLocalPlayer && !Controller.GetComponent<Controller>().SinglePlayer)
 		{
 			return;
 		}
