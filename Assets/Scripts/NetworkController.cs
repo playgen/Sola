@@ -64,7 +64,7 @@ public class NetworkController : NetworkBehaviour {
 				RpcLoseLife(k);
 			}
 		}
-		RpcUpdates(x, start, _updates, _length);
+		RpcUpdates(x, start, _updates, _length, Cont.GetComponent<Controller>().Started);
 		if (!isClient)
 		{
 			Updates(x, start, _updates, _length);
@@ -164,13 +164,14 @@ public class NetworkController : NetworkBehaviour {
 
 	//Update clients
 	[ClientRpc]
-	public void RpcUpdates(int x, bool start, float[] dodgeballs, int length)
+	public void RpcUpdates(int x, bool start, float[] dodgeballs, int length, bool started)
 	{
 		//Send the updated values for the dodgeballs
 		GameObject.FindGameObjectWithTag("DBGenerator").GetComponent<DBGenerator>().UpdateNumbers = dodgeballs;
 		Players = x;
+		Cont.GetComponent<Controller>().Started = started;
 		//If the game has just started tell everyone who is currently there they are in that game and start the countdown
-		if(start)
+		if (start)
 		{
 			Cont.GetComponent<Controller>().StartCounter = 60;
 			for (int i = 0; i < Cont.GetComponent<Controller>().Players.Length; i++)
@@ -211,6 +212,32 @@ public class NetworkController : NetworkBehaviour {
 		{
 			Cont.GetComponent<Controller>().Players[i].GetComponent<PlayerController>().ResetPlayer();
 			Cont.GetComponent<Controller>().GameOver();
+		}
+	}
+
+	//Disconnects
+	[ClientRpc]
+	public void RpcDisconnect(int length)
+	{
+		if (isServer)
+		{
+			if (length == 1)
+			{
+				NetworkManager.GetComponent<NetworkManager>().StopHost();
+				Cont.GetComponent<Controller>().Server = false;
+				Players = 0;
+				Server = false;
+				Client = false;
+			}
+			Cont.GetComponent<Controller>().Clear();
+		}
+		else
+		{
+			NetworkManager.GetComponent<NetworkManager>().StopClient();
+			Cont.GetComponent<Controller>().Clear();
+			Players = 0;
+			Server = false;
+			Client = false;
 		}
 	}
 

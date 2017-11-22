@@ -7,8 +7,8 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
-	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, DBG, NetController, Rankings, PlayerOffline, NetPrefab;
-	public GameObject[] Players;
+	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, DBG, NetController, Rankings, PlayerOffline, Ability;
+	public GameObject[] Players, Buttons;
 	public int[] Positions;
 
 	public IDictionary<string, float> Requested;
@@ -17,14 +17,13 @@ public class Controller : NetworkBehaviour
 	public string PlayerName;
 
 	NetworkManager _networkManager;
-	GameObject _networkManagerGO, _background, _player;
+	GameObject _networkManagerGO, _player;
 	float _materialCounter, _time, _oldTime, _coins;
 	bool _waiting, _running;
 
 	// Use this for initialization
 	void Start()
 	{
-		_background = GameObject.FindGameObjectWithTag("Background");
 		_networkManagerGO = GameObject.FindGameObjectWithTag("NetworkManager");
 		_networkManager = _networkManagerGO.GetComponent<NetworkManager>();
 		Requested = new Dictionary<string, float>();
@@ -41,6 +40,13 @@ public class Controller : NetworkBehaviour
 			_networkManagerGO.GetComponent<NetworkManagerHUD>().enabled = true;
 			PlayerName = SUGARManager.CurrentUser.Name;
 			LoggedIn = true;
+
+			GetResource("coins");
+			GetResource("selected");
+			foreach (GameObject up in Buttons)
+			{
+				GetResource(up.GetComponent<Upgrade>().Key);
+			}
 		});
 	}
 
@@ -55,20 +61,26 @@ public class Controller : NetworkBehaviour
 				_networkManagerGO.GetComponent<NetworkManagerHUD>().enabled = true;
 				PlayerName = SUGARManager.CurrentUser.Name;
 				LoggedIn = true;
+				GetResource("coins");
+				GetResource("selected");
+				foreach (GameObject up in Buttons)
+				{
+					GetResource(up.GetComponent<Upgrade>().Key);
+				}
 			});
+
 		}
 		SinglePlayer = GetComponent<TitleScreenController>().SinglePlayer;
 		Players = GameObject.FindGameObjectsWithTag("Player");
 		Server = NetController.GetComponent<NetworkController>().Server;
 		Client = NetController.GetComponent<NetworkController>().Client;
-		if (Input.GetKey(KeyCode.Escape))
+		if (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length == 1))
 		{
 			Clear();
 		}
 		WaitScreen();
 		RankingManager();
 		StartCounting();
-		Background();
 		if (_running)
 		{
 			Run();
@@ -117,7 +129,7 @@ public class Controller : NetworkBehaviour
 	}
 
 	//Clear data if not connected to any server
-	void Clear()
+	public void Clear()
 	{
 		One.SetActive(false);
 		Two.SetActive(false);
@@ -125,7 +137,11 @@ public class Controller : NetworkBehaviour
 		Wait.SetActive(false);
 		Host.SetActive(false);
 		Tab.SetActive(false);
-		
+		foreach (Transform child in Dots.transform)
+		{
+			child.gameObject.SetActive(false);
+		}
+
 		DBG.GetComponent<DBGenerator>().Counter = 0;
 		StartCounter = -1;
 
@@ -150,26 +166,17 @@ public class Controller : NetworkBehaviour
 		{
 			child.gameObject.SetActive(false);
 		}
-
+		if (Client && !Server)
+		{
+			NetController.GetComponent<NetworkController>().Client = false;
+			_networkManager.GetComponent<NetworkManager>().StopClient();
+			NetController.GetComponent<NetworkController>().Players = 0;
+			NetController.GetComponent<NetworkController>().Server = false;
+			NetController.GetComponent<NetworkController>().Client = false;
+		}
 		if (Server)
 		{
-			_networkManager.StopHost();
-		}
-		else if (Client)
-		{
-			_networkManager.StopClient();
-		}
-		if (NetController != null)
-		{
-			NetController.GetComponent<NetworkController>().Players = 0;
-			GameObject tempNet = GameObject.Instantiate(NetPrefab);
-			tempNet.GetComponent<NetworkController>().NetworkManager = NetController.GetComponent<NetworkController>().NetworkManager;
-			tempNet.GetComponent<NetworkController>().DBGenerator = NetController.GetComponent<NetworkController>().DBGenerator;
-			tempNet.GetComponent<NetworkController>().Cont = NetController.GetComponent<NetworkController>().Cont;
-			tempNet.GetComponent<NetworkController>().Dots = NetController.GetComponent<NetworkController>().Dots;
-			tempNet.tag = "NetworkController";
-			Destroy(NetController);
-			NetController = tempNet;
+			NetController.GetComponent<NetworkController>().RpcDisconnect(GameObject.FindGameObjectsWithTag("Player").Length);
 		}
 	}
 
@@ -328,7 +335,6 @@ public class Controller : NetworkBehaviour
 		{
 			if (SUGARManager.CurrentUser != null)
 			{
-				Debug.Log(_oldTime);
 				SUGARManager.Resource.Add("coins", (long) ((int) _oldTime), success =>
 				{
 					Debug.Log(success);
@@ -344,19 +350,13 @@ public class Controller : NetworkBehaviour
 			{
 				NetController.GetComponent<NetworkController>().Resets();
 			}
+			GameOver();
 		}
 		if (gameOver && SinglePlayer)
 		{
 			GetComponent<SingleController>().Resets();
 			GameOver();
 		}
-	}
-
-	//Background Manager
-	void Background()
-	{
-		_background.GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(0, _materialCounter));
-		_materialCounter += 0.001f;
 	}
 	
 	public void GetResource(string key)

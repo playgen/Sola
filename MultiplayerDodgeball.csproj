@@ -118,14 +118,14 @@
     <Reference Include="PlayGen.Unity.Utilities.Localization">
       <HintPath>Assets\SUGAR\bin\net35\PlayGen.Unity.Utilities.Localization.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <HintPath>Assets\SUGAR\bin\net35\System.ComponentModel.DataAnnotations.dll</HintPath>
+    </Reference>
     <Reference Include="PlayGen.Unity.Utilities.BestFit">
       <HintPath>Assets\SUGAR\Utilities\PlayGen.Unity.Utilities.BestFit.dll</HintPath>
     </Reference>
     <Reference Include="PlayGen.Unity.Utilities.FormKeyboardControls">
       <HintPath>Assets\SUGAR\Utilities\PlayGen.Unity.Utilities.FormKeyboardControls.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations">
-      <HintPath>Assets\SUGAR\bin\net35\System.ComponentModel.DataAnnotations.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +143,7 @@
     <Compile Include="Assets\SUGAR\Example\Scripts\LeaderboardPositionInterface.cs" />
     <Compile Include="Assets\SUGAR\Example\Scripts\TestImplementation.cs" />
     <Compile Include="Assets\SUGAR\Example\Scripts\UserGroupInterface.cs" />
+    <Compile Include="Assets\Scripts\BackgroundController.cs" />
     <Compile Include="Assets\Scripts\ButtonController.cs" />
     <Compile Include="Assets\Scripts\Controller.cs" />
     <Compile Include="Assets\Scripts\DBGenerator.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Assets\Scripts\ScrollController.cs" />
     <Compile Include="Assets\Scripts\ShopControllers.cs" />
     <Compile Include="Assets\Scripts\SingleController.cs" />
+    <Compile Include="Assets\Scripts\StarController.cs" />
     <Compile Include="Assets\Scripts\TitleScreenController.cs" />
     <Compile Include="Assets\Scripts\Upgrade.cs" />
     <Compile Include="Assets\Scripts\UpgradeController.cs" />

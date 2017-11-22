@@ -12,7 +12,7 @@ public class UpgradeController : MonoBehaviour {
 
 	GameObject[] _values;
 	Upgrade[] _buttons;
-	float _wealth, _minus;
+	float _wealth, _minus, _scale;
 	bool _hovered, _done;
 	string _wealthString, _minusString;
 	int _justHovered, _newValue, _individual;
@@ -22,15 +22,11 @@ public class UpgradeController : MonoBehaviour {
 	{
 		_buttons = GetComponentsInChildren<Upgrade>();
 		_values = new GameObject[Positions.Length];
+		_scale = GameObject.FindGameObjectWithTag("Scale").transform.localScale.x;
 		_wealth = 0;
 		_justHovered = 0;
 		_minus = 0.0f;
 		_wealthString = _wealth.ToString();
-		Controller.GetComponent<Controller>().GetResource("coins");
-		foreach (Upgrade up in _buttons)
-		{
-			Controller.GetComponent<Controller>().GetResource(up.Key);
-		}
 		while (_wealthString.Length < 8)
 		{
 			_wealthString = "0" + _wealthString;
@@ -41,6 +37,7 @@ public class UpgradeController : MonoBehaviour {
 			_values[i] = GameObject.Instantiate(Numbers[0]);
 			_values[i].transform.position = Positions[i].transform.position;
 			_values[i].transform.parent = transform;
+			_values[i].transform.localScale = new Vector3(_values[i].transform.localScale.x * _scale, _values[i].transform.localScale.y * _scale, _values[i].transform.localScale.z);
 		}
 	}
 	
@@ -49,9 +46,15 @@ public class UpgradeController : MonoBehaviour {
 	{
 		CalculateDifferences();
 		Dictionary();
+		int quantity = (int)Controller.GetComponent<Controller>().Requested["selected"];
 		foreach (Upgrade up in _buttons)
 		{
 			Clicked(up);
+			up.Selected = false;
+			if ((up.Key == "bomb" && quantity == 1) || (up.Key == "blink" && quantity == 2) || (up.Key == "gun" && quantity == 3) || (up.Key == "shield" && quantity == 4) || (up.Key == "razor" && quantity == 5))
+			{
+				up.Selected = true;
+			}
 		}
 	}
 
@@ -100,13 +103,47 @@ public class UpgradeController : MonoBehaviour {
 					}
 				}
 			}
-			Controller.GetComponent<Controller>().AddResource(up.Key, amount);
-			Controller.GetComponent<Controller>().GetResource(up.Key);
-			_wealth = (_wealth - _minus);
-			up.Pressed = false;
-			up.Red = true;
+			if (_minus > 0)
+			{
+				Controller.GetComponent<Controller>().AddResource(up.Key, amount);
+				Controller.GetComponent<Controller>().GetResource(up.Key);
+				up.Red = true;
+			}
 		}
-		else if (up.Pressed == true)
+		if(up.Red == true && up.Pressed == true)
+		{
+			if (up.Key == "bomb")
+			{
+				Controller.GetComponent<Controller>().SetResource("selected", 1);
+				Controller.GetComponent<Controller>().Requested.Remove("selected");
+				Controller.GetComponent<Controller>().Requested.Add("selected", 1);
+			}
+			else if (up.Key == "blink")
+			{
+				Controller.GetComponent<Controller>().SetResource("selected", 2);
+				Controller.GetComponent<Controller>().Requested.Remove("selected");
+				Controller.GetComponent<Controller>().Requested.Add("selected", 2);
+			}
+			else if (up.Key == "gun")
+			{
+				Controller.GetComponent<Controller>().SetResource("selected", 3);
+				Controller.GetComponent<Controller>().Requested.Remove("selected");
+				Controller.GetComponent<Controller>().Requested.Add("selected", 3);
+			}
+			else if (up.Key == "shield")
+			{
+				Controller.GetComponent<Controller>().SetResource("selected", 4);
+				Controller.GetComponent<Controller>().Requested.Remove("selected");
+				Controller.GetComponent<Controller>().Requested.Add("selected", 4);
+			}
+			else if (up.Key == "razor")
+			{
+				Controller.GetComponent<Controller>().SetResource("selected", 5);
+				Controller.GetComponent<Controller>().Requested.Remove("selected");
+				Controller.GetComponent<Controller>().Requested.Add("selected", 5);
+			}
+		}
+		if (up.Pressed == true)
 		{
 			up.Pressed = false;
 		}
@@ -204,6 +241,7 @@ public class UpgradeController : MonoBehaviour {
 				_values[i].transform.position = Positions[i].transform.position;
 				_values[i].transform.localEulerAngles = new Vector3(-90.0f, 0.0f, 0.0f);
 				_values[i].transform.parent = transform;
+				_values[i].transform.localScale = new Vector3(_values[i].transform.localScale.x * _scale, _values[i].transform.localScale.y * _scale, _values[i].transform.localScale.z);
 
 				if (_minus != 0)
 				{

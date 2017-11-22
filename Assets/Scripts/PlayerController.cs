@@ -7,20 +7,21 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
 	public float Speed;
-	public GameObject Hearts, Controller;
+	public GameObject Hearts, Controller, Spin;
 	public bool Server, Client, InGame, Damage;
 	public string Name;
 	public GameObject[] Stripes = new GameObject[2];
 	public Material[] Materials = new Material[5];
-	public int Invincibility, Health, State;
-	
-	private int _blinkCounter;
-	private float _x,  _y, _z;
+	public int Invincibility, Health, State, CounterTime;
+
+	private int _abilityCounter, _spinCounter;
+	private float _x, _y, _z;
 	private bool _connected;
 	private Vector3 _initialPosition;
+	private Transform[] _ability;
 
 	// Use this for initialization
-	void Start ()
+	void Start()
 	{
 		//Set Initial values
 		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
@@ -29,7 +30,9 @@ public class PlayerController : NetworkBehaviour
 		Controller = GameObject.FindGameObjectWithTag("Controller");
 
 		_initialPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-		_blinkCounter = 0;
+		_ability = Controller.GetComponent<Controller>().Ability.GetComponentsInChildren<Transform>();
+		_abilityCounter = 0;
+		_spinCounter = -1;
 		_connected = false;
 
 		Damage = false;
@@ -39,9 +42,9 @@ public class PlayerController : NetworkBehaviour
 		State = 0;
 		Name = "";
 	}
-	
+
 	// Update is called once per frame
-	void FixedUpdate ()
+	void FixedUpdate()
 	{
 		Health = Hearts.GetComponent<HeartController>().Health;
 		transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z - 2.0f);
@@ -57,7 +60,7 @@ public class PlayerController : NetworkBehaviour
 
 		Server = isServer;
 
-		if(isClient && !_connected)
+		if (isClient && !_connected)
 		{
 			CmdAdd();
 		}
@@ -66,68 +69,31 @@ public class PlayerController : NetworkBehaviour
 		Client = isClient && !Server;
 		Controller.GetComponent<Controller>().Client = Client;
 
-		Blink();
+		if (Input.GetKey(KeyCode.B) && _abilityCounter == 0)
+		{
+			Ability();
+		}
+		if(_spinCounter == 0)
+		{
+			Spin.SetActive(false);
+			_abilityCounter = CounterTime;
+		}
+		if (_spinCounter >= 0)
+		{
+			_spinCounter--;
+		}
+		if (_abilityCounter > 0)
+		{
+			_abilityCounter--;
+			int abilityCalVal = (_abilityCounter / (CounterTime / 8));
+			if (abilityCalVal < 7)
+			{
+				_ability[abilityCalVal].gameObject.SetActive(false);
+			}
+		}
 		Move();
 	}
-
-	//When you press B blink
-	void Blink ()
-	{
-		if (_blinkCounter > 0)
-		{
-			_blinkCounter--;
-		}
-		if (Input.GetKey(KeyCode.B) && _blinkCounter == 0)
-		{
-			_blinkCounter = 30;
-			Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			float angle;
-			if (mouse.x - transform.position.x >= 0.0f)
-			{
-				angle = 90 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
-			}
-			else
-			{
-				angle = 270 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
-			}
-			angle = angle % 90;
-			float x = Mathf.Sin(angle / 180.0f * Mathf.PI);
-			float y = Mathf.Cos(angle / 180.0f * Mathf.PI);
-			if (mouse.x - transform.position.x >= 0.0f && mouse.y - transform.position.y >= 0.0f)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x + x, transform.localPosition.y + y, transform.localPosition.z);
-			}
-			else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y < 0.0f)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x - x, transform.localPosition.y - y, transform.localPosition.z);
-			}
-			else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y >= 0.0f)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x - y, transform.localPosition.y + x, transform.localPosition.z);
-			}
-			else
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x + y, transform.localPosition.y - x, transform.localPosition.z);
-			}
-			if (transform.localPosition.x >= 8.64)
-			{
-				transform.localPosition = new Vector3(8.64f, transform.localPosition.y, transform.localPosition.z);
-			}
-			else if (transform.localPosition.x <= -8.64)
-			{
-				transform.localPosition = new Vector3(-8.64f, transform.localPosition.y, transform.localPosition.z);
-			}
-			if (transform.localPosition.y >= 4.57)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x, 4.57f, transform.localPosition.z);
-			}
-			else if (transform.localPosition.y <= -4.57)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x, -4.57f, transform.localPosition.z);
-			}
-		}
-	}
-
+	
 	//Set Players Colour
 	public void SetColour()
 	{
@@ -216,9 +182,9 @@ public class PlayerController : NetworkBehaviour
 			transform.localPosition = new Vector3(400.0f, 0.0f, 0.0f);
 			State = 1;
 		}
-		if (Controller.GetComponent<Controller>().Started == true && !InGame && State == 1)
+		if (Controller.GetComponent<Controller>().Started == true && !InGame && State == 0)
 		{
-			transform.localPosition = new Vector3(30.0f, 0.0f, 0.0f);
+			transform.localPosition = new Vector3(300.0f, 0.0f, 0.0f);
 			Hearts.GetComponent<HeartController>().Health = 0;
 			State = 2;
 		}
@@ -228,6 +194,10 @@ public class PlayerController : NetworkBehaviour
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.tag == "DodgeBall")
+		{
+			Damage = true;
+		}
+		if(other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
 		{
 			Damage = true;
 		}
@@ -248,5 +218,75 @@ public class PlayerController : NetworkBehaviour
 		//GameObject dodge = (GameObject)Instantiate(Dodgeball);
 		//NetworkServer.Spawn(dodge);
 	}
-	
+
+
+	void Ability()
+	{
+		Spinners();
+		foreach (Transform t in _ability)
+		{
+
+			t.gameObject.SetActive(true);
+		}
+	}
+
+
+	//When you press B blink
+	void Blink()
+	{
+		_abilityCounter = CounterTime;
+		Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		float angle;
+		if (mouse.x - transform.position.x >= 0.0f)
+		{
+			angle = 90 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
+		}
+		else
+		{
+			angle = 270 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
+		}
+		angle = angle % 90;
+		float x = Mathf.Sin(angle / 180.0f * Mathf.PI) * 2.0f;
+		float y = Mathf.Cos(angle / 180.0f * Mathf.PI) * 2.0f;
+		if (mouse.x - transform.position.x >= 0.0f && mouse.y - transform.position.y >= 0.0f)
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x + x, transform.localPosition.y + y, transform.localPosition.z);
+		}
+		else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y < 0.0f)
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x - x, transform.localPosition.y - y, transform.localPosition.z);
+		}
+		else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y >= 0.0f)
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x - y, transform.localPosition.y + x, transform.localPosition.z);
+		}
+		else
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x + y, transform.localPosition.y - x, transform.localPosition.z);
+		}
+		if (transform.localPosition.x >= 8.64)
+		{
+			transform.localPosition = new Vector3(8.64f, transform.localPosition.y, transform.localPosition.z);
+		}
+		else if (transform.localPosition.x <= -8.64)
+		{
+			transform.localPosition = new Vector3(-8.64f, transform.localPosition.y, transform.localPosition.z);
+		}
+		if (transform.localPosition.y >= 4.57)
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x, 4.57f, transform.localPosition.z);
+		}
+		else if (transform.localPosition.y <= -4.57)
+		{
+			transform.localPosition = new Vector3(transform.localPosition.x, -4.57f, transform.localPosition.z);
+		}
+	}
+
+	//When you press B spin
+	void Spinners()
+	{
+		Spin.SetActive(true);
+		_spinCounter = CounterTime / 4;
+		_abilityCounter = -1;
+	}
 }

@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class TitleScreenController : MonoBehaviour {
 
-	public GameObject Store, Shop, Single, Online, Controls, Host, Join, Back, NetworkController, Connecting, PTC, BackTL;
+	public GameObject Store, Shop, Single, Online, Controls, Host, Join, Back, NetworkController, Connecting, PTC, BackTL, Guide;
 	public Material[] Materials;
 	public bool SinglePlayer;
 
@@ -21,11 +21,6 @@ public class TitleScreenController : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		_networkManager = GameObject.FindGameObjectWithTag("NetworkManager");
-		if(NetworkController == null)
-		{
-			NetworkController = GameObject.FindGameObjectWithTag("NetworkController");
-		}
 		if (!_started && GetComponent<Controller>().LoggedIn)
 		{
 			_started = true;
@@ -75,6 +70,7 @@ public class TitleScreenController : MonoBehaviour {
 			Host.transform.GetComponent<Renderer>().material = Materials[0];
 			Host.GetComponent<ButtonController>().Pressed = false;
 			_networkManager.GetComponent<NetworkManager>().StartHost();
+			NetworkServer.Spawn(NetworkController);
 			Host.SetActive(false);
 			Join.SetActive(false);
 			Back.SetActive(false);
@@ -105,6 +101,7 @@ public class TitleScreenController : MonoBehaviour {
 			Controls.transform.GetComponent<Renderer>().material = Materials[0];
 			Controls.GetComponent<ButtonController>().Pressed = false;
 			Controls.SetActive(false);
+			Guide.SetActive(true);
 			Store.SetActive(false);
 			Single.SetActive(false);
 			Online.SetActive(false);
@@ -115,6 +112,7 @@ public class TitleScreenController : MonoBehaviour {
 			BackTL.GetComponent<ButtonController>().Pressed = false;
 			BackTL.SetActive(false);
 			Shop.SetActive(false);
+			Guide.SetActive(false);
 			Store.SetActive(true);
 			Single.SetActive(true);
 			Online.SetActive(true);
@@ -125,10 +123,6 @@ public class TitleScreenController : MonoBehaviour {
 			_networkManager.GetComponent<NetworkManager>().StopClient();
 			PTC.SetActive(false);
 			Connecting.SetActive(false);
-			Host.SetActive(true);
-			Join.SetActive(true);
-			Back.SetActive(true);
-			Controls.SetActive(true);
 		}
 		if (NetworkController.GetComponent<NetworkController>().Server || NetworkController.GetComponent<NetworkController>().Client)
 		{

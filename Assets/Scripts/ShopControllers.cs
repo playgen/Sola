@@ -132,11 +132,27 @@ public class ShopControllers : MonoBehaviour {
 			_bullet.transform.parent = transform;
 			_bullet.transform.position = new Vector3(Bullet.transform.position.x, Bullet.transform.position.y, Bullet.transform.position.z);
 			_bullet.SetActive(true);
+			_counter = WaitTime;
 		}
 		else if (_bullet != null)
 		{
 			_bullet.transform.localPosition = new Vector3(_bullet.transform.localPosition.x + 0.5f, _bullet.transform.localPosition.y, _bullet.transform.localPosition.z);
-			_counter = WaitTime;
+		}
+		if(_counter >= 50)
+		{
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, 60.0f - _counter);
+		}
+		else if (_counter >= 40)
+		{
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, _counter - 40);
+		}
+		else if (_counter >= 35)
+		{
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, _counter - 40);
+		}
+		else if (_counter >= 30)
+		{
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, 30 - _counter);
 		}
 		if (_counter > 0)
 		{

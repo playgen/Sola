@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Upgrade : MonoBehaviour {
 
-	public Sprite[] Sprites = new Sprite[3];
+	public Sprite[] Sprites;
 	public GameObject[] Previous;
 
-	public bool Hover, Pressed, Red;
+	public bool Hover, Pressed, Red, Selected;
 	public float Value, SoloValue;
 	public string Key;
 	
@@ -24,14 +24,19 @@ public class Upgrade : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
-		if (Red)
-		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[2];
-		}
-		else if (Hover)
+	void FixedUpdate ()
+	{
+		if (Hover)
 		{
 			GetComponent<SpriteRenderer>().sprite = Sprites[1];
+		}
+		else if (Selected)
+		{
+			GetComponent<SpriteRenderer>().sprite = Sprites[3];
+		}
+		else if (Red)
+		{
+			GetComponent<SpriteRenderer>().sprite = Sprites[2];
 		}
 		else
 		{
