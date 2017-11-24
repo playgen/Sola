@@ -21,6 +21,8 @@ TagManager:
   - Shop
   - DBSGenerator
   - Star
+  - Explosion
+  - Bullet
   layers:
   - Default
   - TransparentFX

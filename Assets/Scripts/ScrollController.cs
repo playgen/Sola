@@ -18,11 +18,11 @@ public class ScrollController : MonoBehaviour {
 		{
 			if (Direction < 0.0f)
 			{
-				transform.localPosition = new Vector3(Distance, transform.localPosition.y, 0.0f);
+				transform.localPosition = new Vector3(Distance, transform.localPosition.y, transform.localPosition.z);
 			}
 			else
 			{
-				transform.localPosition = new Vector3(-Distance, transform.localPosition.y, 0.0f);
+				transform.localPosition = new Vector3(-Distance, transform.localPosition.y, transform.localPosition.z);
 			}
 		}
 	}
@@ -41,10 +41,10 @@ public class ScrollController : MonoBehaviour {
 		}
 		else
 		{
-			transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, 0.0f);
+			transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, transform.localPosition.z);
 			if (transform.localPosition.x > Distance || transform.localPosition.x < -Distance)
 			{
-				transform.localPosition = new Vector3(-transform.localPosition.x, transform.localPosition.y, 0.0f);
+				transform.localPosition = new Vector3(-transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
 			}
 		}
 	}

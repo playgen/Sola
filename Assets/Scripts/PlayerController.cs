@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour
 {
-	public float Speed;
-	public GameObject Hearts, Controller, Spin;
+	public float Speed, Time;
+	public GameObject Hearts, Controller, Spin, Shield, Bomb, Bullet;
 	public bool Server, Client, InGame, Damage;
 	public string Name;
 	public GameObject[] Stripes = new GameObject[2];
@@ -41,6 +41,7 @@ public class PlayerController : NetworkBehaviour
 		Client = false;
 		State = 0;
 		Name = "";
+		Time = 99999;
 	}
 
 	// Update is called once per frame
@@ -69,9 +70,16 @@ public class PlayerController : NetworkBehaviour
 		Client = isClient && !Server;
 		Controller.GetComponent<Controller>().Client = Client;
 
-		if (Input.GetKey(KeyCode.B) && _abilityCounter == 0)
+		if (Input.GetKey(KeyCode.E) && _abilityCounter == 0 && Controller.GetComponent<Controller>().Requested["selected"] != 0 && Controller.GetComponent<Controller>().Started)
 		{
-			Ability();
+			if(isClient)
+			{
+				CmdAbility(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.localPosition, transform.position);
+			}
+			else
+			{
+				Ability(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.localPosition, transform.position);
+			}
 		}
 		if(_spinCounter == 0)
 		{
@@ -88,7 +96,7 @@ public class PlayerController : NetworkBehaviour
 			int abilityCalVal = (_abilityCounter / (CounterTime / 8));
 			if (abilityCalVal < 7)
 			{
-				_ability[abilityCalVal].gameObject.SetActive(false);
+				_ability[abilityCalVal].GetComponent<SpriteRenderer>().enabled = false;
 			}
 		}
 		Move();
@@ -196,10 +204,26 @@ public class PlayerController : NetworkBehaviour
 		if (other.tag == "DodgeBall")
 		{
 			Damage = true;
+			if (Shield.activeSelf)
+			{
+				Hearts.GetComponent<HeartController>().Health++;
+				Shield.SetActive(false);
+			}
 		}
 		if(other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
 		{
 			Damage = true;
+		}
+		if (other.tag == "Explosion")
+		{
+			Damage = true;
+		}
+		if (other.tag == "Bullet")
+		{
+			if (other.GetComponent<BulletController>().From != transform)
+			{
+				Damage = true;
+			}
 		}
 	}
 
@@ -213,20 +237,43 @@ public class PlayerController : NetworkBehaviour
 	void CmdName(string playerName)
 	{
 		Name = playerName;
+	}
 
-
-		//GameObject dodge = (GameObject)Instantiate(Dodgeball);
-		//NetworkServer.Spawn(dodge);
+	[Command]
+	void CmdAbility(float selected, Vector3 mouse, Vector3 local, Vector3 regular)
+	{
+		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().RpcAbility(gameObject, selected, mouse, local, regular);
 	}
 
 
-	void Ability()
+	public void Ability(float selected, Vector3 mouse, Vector3 local, Vector3 regular)
 	{
-		Spinners();
-		foreach (Transform t in _ability)
+		if (selected == 1)
 		{
-
-			t.gameObject.SetActive(true);
+			Explode(mouse, local, regular);
+		}
+		if (selected == 2)
+		{
+			Blink();
+		}
+		if (selected == 3)
+		{
+			Turret();
+		}
+		if (selected == 4)
+		{
+			Block();
+		}
+		if (selected == 5)
+		{
+			Spinners();
+		}
+		if(isLocalPlayer || Controller.GetComponent<Controller>().SinglePlayer)
+		{
+			foreach (Transform t in _ability)
+			{
+				t.GetComponent<SpriteRenderer>().enabled = true;
+			}
 		}
 	}
 
@@ -288,5 +335,74 @@ public class PlayerController : NetworkBehaviour
 		Spin.SetActive(true);
 		_spinCounter = CounterTime / 4;
 		_abilityCounter = -1;
+	}
+
+	//When you press B spin
+	void Block()
+	{
+		Shield.SetActive(true);
+		_abilityCounter = CounterTime;
+	}
+
+	//When you press B spin
+	void Explode(Vector3 mouse, Vector3 local, Vector3 regular)
+	{
+		GameObject bomb = Instantiate(Bomb);
+		bomb.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
+		bomb.transform.localPosition = new Vector3(local.x, local.y, local.z);
+		_abilityCounter = CounterTime;
+
+		float angle;
+		if (mouse.x - regular.x >= 0.0f)
+		{
+			angle = 90 - Mathf.Atan((mouse.y - regular.y) / (mouse.x - regular.x)) * 180.0f / Mathf.PI;
+		}
+		else
+		{
+			angle = 270 - Mathf.Atan((mouse.y - regular.y) / (mouse.x - regular.x)) * 180.0f / Mathf.PI;
+		}
+		angle = angle % 90;
+		float x = Mathf.Sin(angle / 180.0f * Mathf.PI) * 2.0f;
+		float y = Mathf.Cos(angle / 180.0f * Mathf.PI) * 2.0f;
+		if (mouse.x - regular.x >= 0.0f && mouse.y - regular.y >= 0.0f)
+		{
+			bomb.GetComponent<Rigidbody>().velocity = new Vector3(x, y, 0);
+		}
+		else if (mouse.x - regular.x < 0.0f && mouse.y - regular.y < 0.0f)
+		{
+			bomb.GetComponent<Rigidbody>().velocity = new Vector3(-x, -y, 0);
+		}
+		else if (mouse.x - regular.x < 0.0f && mouse.y - regular.y >= 0.0f)
+		{
+			bomb.GetComponent<Rigidbody>().velocity = new Vector3(-y, x, 0);
+		}
+		else
+		{
+			bomb.GetComponent<Rigidbody>().velocity = new Vector3(y, -x, 0);
+		}
+	}
+
+	//When you press B spin
+	void Turret()
+	{
+		float turn = 0.0f;
+		for(int i = 0; i < 6; i++)
+		{
+			GameObject bullet = Instantiate(Bullet);
+			bullet.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
+			bullet.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
+			bullet.transform.localEulerAngles = new Vector3(0.0f, 0.0f, turn);
+			bullet.GetComponentInChildren<BulletController>().From = transform;
+			turn += 60.0f;
+		}
+		_abilityCounter = CounterTime;
+	}
+
+	void setTime(float time)
+	{
+		if (Time > time)
+		{
+			time = Time;
+		}
 	}
 }

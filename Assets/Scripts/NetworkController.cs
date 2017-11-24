@@ -241,6 +241,13 @@ public class NetworkController : NetworkBehaviour {
 		}
 	}
 
+	//Ability
+	[ClientRpc]
+	public void RpcAbility(GameObject player, float selected, Vector3 mouse, Vector3 local, Vector3 regular)
+	{
+		player.GetComponent<PlayerController>().Ability(selected, mouse, local, regular);
+	}
+
 	public void Dodge(bool five)
 	{
 		if (five)

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
-	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, DBG, NetController, Rankings, PlayerOffline, Ability;
+	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, DBG, NetController, Rankings, PlayerOffline, Ability, GameTime;
 	public GameObject[] Players, Buttons;
 	public int[] Positions;
 
@@ -74,7 +74,7 @@ public class Controller : NetworkBehaviour
 		Players = GameObject.FindGameObjectsWithTag("Player");
 		Server = NetController.GetComponent<NetworkController>().Server;
 		Client = NetController.GetComponent<NetworkController>().Client;
-		if (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length == 1))
+		if (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length <= 1))
 		{
 			Clear();
 		}
@@ -141,10 +141,15 @@ public class Controller : NetworkBehaviour
 		{
 			child.gameObject.SetActive(false);
 		}
+		foreach (Transform t in Ability.GetComponentsInChildren<Transform>())
+		{
+			t.GetComponent<SpriteRenderer>().enabled = false;
+		}
 
 		DBG.GetComponent<DBGenerator>().Counter = 0;
+		DBG.GetComponent<DBGenerator>().InGame = false;
 		StartCounter = -1;
-
+		
 		SinglePlayer = false;
 		_running = false;
 		Started = false;
@@ -309,6 +314,8 @@ public class Controller : NetworkBehaviour
 	void Run()
 	{
 		float time = ((float)((int)(10.0f * (Time.time - _time))) / 10.0f);
+		GameTime.SetActive(true);
+		GameTime.GetComponent<PlaceController>().Score = (int) time;
 		if (_oldTime != time && time % 5.0f == 0.0f && time <= 100.0f && Server)
 		{
 			NetController.GetComponent<NetworkController>().RpcDodge(false);
@@ -329,6 +336,7 @@ public class Controller : NetworkBehaviour
 			if (Players[Positions[z]].GetComponent<PlayerController>().Health != 0)
 			{
 				gameOver = false;
+				Players[Positions[z]].GetComponent<PlayerController>().Time = time;
 			}
 		}
 		if (_player.GetComponent<PlayerController>().State == 1)
@@ -343,7 +351,13 @@ public class Controller : NetworkBehaviour
 			}
 			_player.GetComponent<PlayerController>().State = 2;
 		}
-		if (gameOver && Server)
+		if(gameOver)
+		{
+			GetComponent<WinnerScreen>().Run(Players);
+		}
+		bool reset = false;
+		//reset = gameOver;
+		if (reset && Server)
 		{
 			NetController.GetComponent<NetworkController>().RpcResets();
 			if(!Client)
@@ -352,10 +366,14 @@ public class Controller : NetworkBehaviour
 			}
 			GameOver();
 		}
-		if (gameOver && SinglePlayer)
+		if (reset && SinglePlayer)
 		{
 			GetComponent<SingleController>().Resets();
 			GameOver();
+		}
+		if (!Started)
+		{
+			_time = Time.time;
 		}
 	}
 	

@@ -144,21 +144,26 @@
     <Compile Include="Assets\SUGAR\Example\Scripts\TestImplementation.cs" />
     <Compile Include="Assets\SUGAR\Example\Scripts\UserGroupInterface.cs" />
     <Compile Include="Assets\Scripts\BackgroundController.cs" />
+    <Compile Include="Assets\Scripts\BombController.cs" />
+    <Compile Include="Assets\Scripts\BulletController.cs" />
     <Compile Include="Assets\Scripts\ButtonController.cs" />
     <Compile Include="Assets\Scripts\Controller.cs" />
     <Compile Include="Assets\Scripts\DBGenerator.cs" />
     <Compile Include="Assets\Scripts\DodgeController.cs" />
     <Compile Include="Assets\Scripts\HeartController.cs" />
     <Compile Include="Assets\Scripts\NetworkController.cs" />
+    <Compile Include="Assets\Scripts\PlaceController.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\ScaleController.cs" />
     <Compile Include="Assets\Scripts\ScrollController.cs" />
+    <Compile Include="Assets\Scripts\ShieldController.cs" />
     <Compile Include="Assets\Scripts\ShopControllers.cs" />
     <Compile Include="Assets\Scripts\SingleController.cs" />
     <Compile Include="Assets\Scripts\StarController.cs" />
     <Compile Include="Assets\Scripts\TitleScreenController.cs" />
     <Compile Include="Assets\Scripts\Upgrade.cs" />
     <Compile Include="Assets\Scripts\UpgradeController.cs" />
+    <Compile Include="Assets\Scripts\WinnerScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SUGAR\bin\net35\link.xml" />

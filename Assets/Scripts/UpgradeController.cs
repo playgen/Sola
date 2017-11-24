@@ -241,7 +241,7 @@ public class UpgradeController : MonoBehaviour {
 				_values[i].transform.position = Positions[i].transform.position;
 				_values[i].transform.localEulerAngles = new Vector3(-90.0f, 0.0f, 0.0f);
 				_values[i].transform.parent = transform;
-				_values[i].transform.localScale = new Vector3(_values[i].transform.localScale.x * _scale, _values[i].transform.localScale.y * _scale, _values[i].transform.localScale.z);
+				_values[i].transform.localScale = new Vector3(0.5f, 0.5f, _values[i].transform.localScale.z);
 
 				if (_minus != 0)
 				{
