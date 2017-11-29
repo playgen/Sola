@@ -348,7 +348,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1991596580796426}
   m_LocalRotation: {x: -0, y: -0, z: 0.9848075, w: 0.17364974}
-  m_LocalPosition: {x: 3.151, y: -0.00000071564955, z: 0.000000067055225}
+  m_LocalPosition: {x: 0, y: 0, z: 0.000000067055225}
   m_LocalScale: {x: 0.533627, y: 0.533627, z: 0.1}
   m_Children:
   - {fileID: 4353184503643604}
@@ -586,7 +586,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 48
+  m_Constraints: 56
   m_CollisionDetection: 0
 --- !u!65 &65120991844087916
 BoxCollider:
@@ -693,6 +693,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 30
+  Time: 0
   Hearts: {fileID: 1086484620486788}
   Controller: {fileID: 0}
   Spin: {fileID: 1388133600979750}

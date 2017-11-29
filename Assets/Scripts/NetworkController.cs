@@ -37,7 +37,7 @@ public class NetworkController : NetworkBehaviour {
 		{
 			ServerUpdate();
 		}
-		Names();
+		Name();
 	}
 
 	//Server update stuff
@@ -72,11 +72,13 @@ public class NetworkController : NetworkBehaviour {
 	}
 
 	//Name stuff
-	void Names()
+	void Name()
 	{
 		if (isClient)
 		{
-			string[] names = new string[Cont.GetComponent<Controller>().Players.Length];
+			int x = Cont.GetComponent<Controller>().Players.Length;
+			string[] names = new string[x];
+			float[] scales = new float[x];
 			//Make it send the name the the server
 			for (int i = 0; i < Cont.GetComponent<Controller>().Players.Length; i++)
 			{
@@ -243,9 +245,9 @@ public class NetworkController : NetworkBehaviour {
 
 	//Ability
 	[ClientRpc]
-	public void RpcAbility(GameObject player, float selected, Vector3 mouse, Vector3 local, Vector3 regular)
+	public void RpcAbility(GameObject player, float selected, Vector3 mouse, Vector3 regular)
 	{
-		player.GetComponent<PlayerController>().Ability(selected, mouse, local, regular);
+		player.GetComponent<PlayerController>().Ability(selected, mouse, regular);
 	}
 
 	public void Dodge(bool five)

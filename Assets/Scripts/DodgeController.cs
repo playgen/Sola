@@ -16,7 +16,7 @@ public class DodgeController : MonoBehaviour
 	GameObject _controller, _dbGenerator;
 	float[] _angles;
 	float _x, _y, _secondAngle, _varRandom, _rotationAngle;
-	int _fireTime, _counter, _countDown;
+	int _fireTime, _origTime, _counter, _countDown;
 	bool _hit, _server;
 
 	// Gives the ball a random size and speed
@@ -77,16 +77,16 @@ public class DodgeController : MonoBehaviour
 				_countDown = 1;
 				State = 1;
 			}
-			else
-			{
-				GetComponent<MeshRenderer>().enabled = true;
-			}
 		}
 		Angles();
 		Reset();
 		//fire time is the amount of time after the ball spawns before it can fire. just creates a delay
 		if (_fireTime > 0 && _controller.GetComponent<Controller>().Started)
 		{
+			if(_fireTime + 10 == _origTime)
+			{
+				GetComponent<MeshRenderer>().enabled = true;
+			}
 			_fireTime--;
 		}
 
@@ -222,11 +222,11 @@ public class DodgeController : MonoBehaviour
 			{
 				if (Players[i].transform.position.x - transform.position.x >= 0.0f)
 				{
-					_angles[i] = 90 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
+					_angles[i] = 90 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[i].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
 				}
 				else
 				{
-					_angles[i] = 270 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[0].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
+					_angles[i] = 270 - Mathf.Atan((Players[i].transform.position.y - transform.position.y) / (Players[i].transform.position.x - transform.position.x)) * 180.0f / Mathf.PI;
 				}
 				_angles[i] = 180.0f - _angles[i];
 				while (_angles[i] < 0.0f)
@@ -255,6 +255,7 @@ public class DodgeController : MonoBehaviour
 			if (_countDown == 0)
 			{
 				_fireTime = (int)Random.Range(50, 500);
+				_origTime = _fireTime;
 				int random = (int)Random.Range(0, 4);
 				if (random == 0)
 				{

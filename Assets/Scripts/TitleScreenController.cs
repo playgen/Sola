@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class TitleScreenController : MonoBehaviour {
 
-	public GameObject Store, Shop, Single, Online, Controls, Host, Join, Back, NetworkController, Connecting, PTC, BackTL, Guide;
+	public GameObject Store, Shop, Single, Online, Controls, Host, Join, Back, NetworkController, Connecting, PTC, BackTL, Guide, Lights;
 	public Material[] Materials;
 	public bool SinglePlayer;
 
@@ -23,6 +23,7 @@ public class TitleScreenController : MonoBehaviour {
 	{
 		if (!_started && GetComponent<Controller>().LoggedIn)
 		{
+			Lights.GetComponent<ParticleController>().Run();
 			_started = true;
 			Store.SetActive(true);
 			Single.SetActive(true);
@@ -68,6 +69,7 @@ public class TitleScreenController : MonoBehaviour {
 		if (Host.GetComponent<ButtonController>().Pressed == true)
 		{
 			Host.transform.GetComponent<Renderer>().material = Materials[0];
+			Lights.GetComponent<ParticleController>().Stop();
 			Host.GetComponent<ButtonController>().Pressed = false;
 			_networkManager.GetComponent<NetworkManager>().StartHost();
 			NetworkServer.Spawn(NetworkController);
@@ -78,6 +80,7 @@ public class TitleScreenController : MonoBehaviour {
 		if (Join.GetComponent<ButtonController>().Pressed == true)
 		{
 			Join.transform.GetComponent<Renderer>().material = Materials[0];
+			Lights.GetComponent<ParticleController>().Stop();
 			_networkManager.GetComponent<NetworkManager>().StartClient();
 			PTC.SetActive(true);
 			Connecting.SetActive(true);
@@ -89,6 +92,7 @@ public class TitleScreenController : MonoBehaviour {
 		if (Single.GetComponent<ButtonController>().Pressed == true)
 		{
 			Single.transform.GetComponent<Renderer>().material = Materials[0];
+			Lights.GetComponent<ParticleController>().Stop();
 			Single.GetComponent<ButtonController>().Pressed = false;
 			SinglePlayer = true;
 			Store.SetActive(false);

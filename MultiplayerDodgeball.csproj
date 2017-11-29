@@ -152,6 +152,7 @@
     <Compile Include="Assets\Scripts\DodgeController.cs" />
     <Compile Include="Assets\Scripts\HeartController.cs" />
     <Compile Include="Assets\Scripts\NetworkController.cs" />
+    <Compile Include="Assets\Scripts\ParticleController.cs" />
     <Compile Include="Assets\Scripts\PlaceController.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\ScaleController.cs" />

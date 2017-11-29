@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlaceController : MonoBehaviour {
 
-	public GameObject Player, Position;
-	public GameObject[] Numbers;
+	public GameObject Position, Player;
+	public GameObject[] Numbers, Stripes;
 	public Sprite[] Sprites;
 	public int Score;
 
@@ -28,6 +28,10 @@ public class PlaceController : MonoBehaviour {
 		for(int i = 0; i < 5; i++)
 		{
 			Numbers[i].GetComponent<SpriteRenderer>().sprite = Sprites[int.Parse(scoreString.Substring(i, 1))];
+		}
+		foreach(GameObject s in Stripes)
+		{
+			s.GetComponent<Renderer>().material = Player.GetComponent<PlayerController>().Stripes[0].GetComponent<Renderer>().material;
 		}
 	}
 }

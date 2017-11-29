@@ -7,12 +7,12 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
-	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, DBG, NetController, Rankings, PlayerOffline, Ability, GameTime;
-	public GameObject[] Players, Buttons;
+	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, NetController, Rankings, PlayerOffline, Ability, GameTime, Lights;
+	public GameObject[] Players, Buttons, DBGS;
 	public int[] Positions;
 
 	public IDictionary<string, float> Requested;
-	public int StartCounter;
+	public int StartCounter, GameOverCounter;
 	public bool Started, Server, Client, LoggedIn, SinglePlayer;
 	public string PlayerName;
 
@@ -40,7 +40,7 @@ public class Controller : NetworkBehaviour
 			_networkManagerGO.GetComponent<NetworkManagerHUD>().enabled = true;
 			PlayerName = SUGARManager.CurrentUser.Name;
 			LoggedIn = true;
-
+			Lights.GetComponent<ParticleController>().Run();
 			GetResource("coins");
 			GetResource("selected");
 			foreach (GameObject up in Buttons)
@@ -126,6 +126,7 @@ public class Controller : NetworkBehaviour
 		{
 			Destroy(b);
 		}
+		GetComponent<WinnerScreen>().Clear();
 	}
 
 	//Clear data if not connected to any server
@@ -145,9 +146,11 @@ public class Controller : NetworkBehaviour
 		{
 			t.GetComponent<SpriteRenderer>().enabled = false;
 		}
-
-		DBG.GetComponent<DBGenerator>().Counter = 0;
-		DBG.GetComponent<DBGenerator>().InGame = false;
+		foreach (GameObject DBG in DBGS)
+		{
+			DBG.GetComponent<DBGenerator>().Counter = 0;
+			DBG.GetComponent<DBGenerator>().InGame = false;
+		}
 		StartCounter = -1;
 		
 		SinglePlayer = false;
@@ -183,6 +186,7 @@ public class Controller : NetworkBehaviour
 		{
 			NetController.GetComponent<NetworkController>().RpcDisconnect(GameObject.FindGameObjectsWithTag("Player").Length);
 		}
+		GetComponent<WinnerScreen>().Clear();
 	}
 
 	//The countdown between when TAB is pressed and when the game actually starts
@@ -315,8 +319,7 @@ public class Controller : NetworkBehaviour
 	{
 		float time = ((float)((int)(10.0f * (Time.time - _time))) / 10.0f);
 		GameTime.SetActive(true);
-		GameTime.GetComponent<PlaceController>().Score = (int) time;
-		if (_oldTime != time && time % 5.0f == 0.0f && time <= 100.0f && Server)
+		if (_oldTime != time && time % 5.0f == 0.0f && time <= 100.0f && Server && time != 0.0f)
 		{
 			NetController.GetComponent<NetworkController>().RpcDodge(false);
 			if(!Client)
@@ -329,7 +332,6 @@ public class Controller : NetworkBehaviour
 			GetComponent<SingleController>().Dodge(false);
 		}
 		_oldTime = time;
-		Text.GetComponent<Text>().text = "" + time;
 		bool gameOver = true;
 		for (int z = 0; z < Players.Length; z++)
 		{
@@ -354,22 +356,37 @@ public class Controller : NetworkBehaviour
 		if(gameOver)
 		{
 			GetComponent<WinnerScreen>().Run(Players);
+			if(GameOverCounter == 0)
+			{
+				GameOverCounter = 400;
+				Lights.GetComponent<ParticleController>().Run();
+			}
+			else
+			{
+				GameOverCounter--;
+			}
 		}
-		bool reset = false;
-		//reset = gameOver;
-		if (reset && Server)
+		else
 		{
+			if (GameOverCounter > 0)
+			{
+				GameOverCounter = 0;
+			}
+			GameTime.GetComponent<PlaceController>().Score = (int)time;
+		}
+		if (gameOver && Server && GameOverCounter == 0)
+		{
+			GameOver();
 			NetController.GetComponent<NetworkController>().RpcResets();
 			if(!Client)
 			{
 				NetController.GetComponent<NetworkController>().Resets();
 			}
-			GameOver();
 		}
-		if (reset && SinglePlayer)
+		if (gameOver && SinglePlayer && GameOverCounter == 0)
 		{
-			GetComponent<SingleController>().Resets();
 			GameOver();
+			GetComponent<SingleController>().Resets();
 		}
 		if (!Started)
 		{

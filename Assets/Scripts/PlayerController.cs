@@ -24,10 +24,8 @@ public class PlayerController : NetworkBehaviour
 	void Start()
 	{
 		//Set Initial values
-		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
-		Hearts.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
 		Controller = GameObject.FindGameObjectWithTag("Controller");
+		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
 
 		_initialPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
 		_ability = Controller.GetComponent<Controller>().Ability.GetComponentsInChildren<Transform>();
@@ -58,7 +56,6 @@ public class PlayerController : NetworkBehaviour
 		{
 			return;
 		}
-
 		Server = isServer;
 
 		if (isClient && !_connected)
@@ -74,11 +71,11 @@ public class PlayerController : NetworkBehaviour
 		{
 			if(isClient)
 			{
-				CmdAbility(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.localPosition, transform.position);
+				CmdAbility(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.position);
 			}
 			else
 			{
-				Ability(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.localPosition, transform.position);
+				Ability(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.position);
 			}
 		}
 		if(_spinCounter == 0)
@@ -158,7 +155,7 @@ public class PlayerController : NetworkBehaviour
 		_x = transform.GetComponent<Rigidbody>().velocity.x;
 		_y = transform.GetComponent<Rigidbody>().velocity.y;
 		_z = transform.GetComponent<Rigidbody>().velocity.z;
-		if (Controller.GetComponent<Controller>().Started)
+		if (Controller.GetComponent<Controller>().Started && Controller.GetComponent<Controller>().GameOverCounter == 0)
 		{
 			if (Input.GetKey(KeyCode.W))
 			{
@@ -226,6 +223,34 @@ public class PlayerController : NetworkBehaviour
 			}
 		}
 	}
+	//When hit by a dodgeball turn Damage to true
+	void OnTriggerStay(Collider other)
+	{
+		if (other.tag == "DodgeBall")
+		{
+			Damage = true;
+			if (Shield.activeSelf)
+			{
+				Hearts.GetComponent<HeartController>().Health++;
+				Shield.SetActive(false);
+			}
+		}
+		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
+		{
+			Damage = true;
+		}
+		if (other.tag == "Explosion")
+		{
+			Damage = true;
+		}
+		if (other.tag == "Bullet")
+		{
+			if (other.GetComponent<BulletController>().From != transform)
+			{
+				Damage = true;
+			}
+		}
+	}
 
 	[Command]
 	public void CmdAdd()
@@ -240,17 +265,17 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	[Command]
-	void CmdAbility(float selected, Vector3 mouse, Vector3 local, Vector3 regular)
+	void CmdAbility(float selected, Vector3 mouse, Vector3 regular)
 	{
-		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().RpcAbility(gameObject, selected, mouse, local, regular);
+		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().RpcAbility(gameObject, selected, mouse, regular);
 	}
 
 
-	public void Ability(float selected, Vector3 mouse, Vector3 local, Vector3 regular)
+	public void Ability(float selected, Vector3 mouse, Vector3 regular)
 	{
 		if (selected == 1)
 		{
-			Explode(mouse, local, regular);
+			Explode(mouse, regular);
 		}
 		if (selected == 2)
 		{
@@ -345,11 +370,9 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	//When you press B spin
-	void Explode(Vector3 mouse, Vector3 local, Vector3 regular)
+	void Explode(Vector3 mouse, Vector3 regular)
 	{
 		GameObject bomb = Instantiate(Bomb);
-		bomb.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
-		bomb.transform.localPosition = new Vector3(local.x, local.y, local.z);
 		_abilityCounter = CounterTime;
 
 		float angle;
@@ -389,7 +412,6 @@ public class PlayerController : NetworkBehaviour
 		for(int i = 0; i < 6; i++)
 		{
 			GameObject bullet = Instantiate(Bullet);
-			bullet.transform.parent = GameObject.FindGameObjectWithTag("Scale").transform;
 			bullet.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
 			bullet.transform.localEulerAngles = new Vector3(0.0f, 0.0f, turn);
 			bullet.GetComponentInChildren<BulletController>().From = transform;

@@ -12,7 +12,7 @@ public class UpgradeController : MonoBehaviour {
 
 	GameObject[] _values;
 	Upgrade[] _buttons;
-	float _wealth, _minus, _scale;
+	float _wealth, _minus;
 	bool _hovered, _done;
 	string _wealthString, _minusString;
 	int _justHovered, _newValue, _individual;
@@ -22,7 +22,6 @@ public class UpgradeController : MonoBehaviour {
 	{
 		_buttons = GetComponentsInChildren<Upgrade>();
 		_values = new GameObject[Positions.Length];
-		_scale = GameObject.FindGameObjectWithTag("Scale").transform.localScale.x;
 		_wealth = 0;
 		_justHovered = 0;
 		_minus = 0.0f;
@@ -37,7 +36,6 @@ public class UpgradeController : MonoBehaviour {
 			_values[i] = GameObject.Instantiate(Numbers[0]);
 			_values[i].transform.position = Positions[i].transform.position;
 			_values[i].transform.parent = transform;
-			_values[i].transform.localScale = new Vector3(_values[i].transform.localScale.x * _scale, _values[i].transform.localScale.y * _scale, _values[i].transform.localScale.z);
 		}
 	}
 	

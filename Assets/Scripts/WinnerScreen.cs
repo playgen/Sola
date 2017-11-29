@@ -28,12 +28,21 @@ public class WinnerScreen : MonoBehaviour {
 			times.Sort();
 			for (int j = 0; j < Players.Length; j++)
 			{
+				int offset = 4 - Players.Length;
 				int position = times.IndexOf(Players[j].GetComponent<PlayerController>().Time);
-				string score = times[position].ToString();
-				int x = int.Parse(score.ToLower());
-				Debug.Log(x.GetType());
-				podiums[position].SetActive(true);
+				int score = (int)((float)times[position]);
+				podiums[position + offset].SetActive(true);
+				podiums[position + offset].GetComponent<PlaceController>().Player = Players[j];
+				podiums[position + offset].GetComponent<PlaceController>().Score = score;
 			}
+		}
+	}
+
+	public void Clear()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			podiums[i].SetActive(false);
 		}
 	}
 }

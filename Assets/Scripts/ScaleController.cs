@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ScaleController : MonoBehaviour {
-
+	
 	// Use this for initialization
 	void Start () {
 		
@@ -13,6 +13,6 @@ public class ScaleController : MonoBehaviour {
 	void FixedUpdate () {
 		float ratio = ((float) Screen.width) / ((float)Screen.height);
 		float initial = 1.778417f;
-		transform.localScale = new Vector3(ratio / initial, ratio / initial, 1);
+		GetComponent<Camera>().orthographicSize = 5 / (ratio / initial);
 	}
 }
