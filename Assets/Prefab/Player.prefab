@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 212905233490117974}
   - component: {fileID: 65243698446235108}
   - component: {fileID: 65994074950369370}
-  - component: {fileID: 114699291501653512}
+  - component: {fileID: 114305145843920474}
   m_Layer: 0
   m_Name: Star
   m_TagString: Star
@@ -155,8 +155,8 @@ GameObject:
   - component: {fileID: 4773515106701264}
   - component: {fileID: 212969846664455886}
   - component: {fileID: 65885598423176286}
-  - component: {fileID: 114310282147727196}
   - component: {fileID: 65434476036048786}
+  - component: {fileID: 114017163731049216}
   m_Layer: 0
   m_Name: Star-1 (1)
   m_TagString: Untagged
@@ -636,6 +636,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.46, y: 0.14, z: 0.2}
   m_Center: {x: 0, y: -0.03, z: 0}
+--- !u!114 &114017163731049216
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1767388039516868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dd8fcef198e3614d918e93494f797d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotation: -6
 --- !u!114 &114208217406687180
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -657,18 +669,18 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
---- !u!114 &114310282147727196
+--- !u!114 &114305145843920474
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1767388039516868}
+  m_GameObject: {fileID: 1021892478319886}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ccf2180d1bc9334c998cd907aa79923, type: 3}
+  m_Script: {fileID: 11500000, guid: 1dd8fcef198e3614d918e93494f797d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotation: 6
+  rotation: 2
 --- !u!114 &114389231459081968
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -706,18 +718,6 @@ MonoBehaviour:
   Health: 0
   State: 0
   CounterTime: 300
---- !u!114 &114699291501653512
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1021892478319886}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ccf2180d1bc9334c998cd907aa79923, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotation: 6
 --- !u!114 &114788405444113522
 MonoBehaviour:
   m_ObjectHideFlags: 1

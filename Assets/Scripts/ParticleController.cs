@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Particle controller. Has a play and stop method
 public class ParticleController : MonoBehaviour {
 
 	ParticleSystem[] _particles;
@@ -17,7 +19,7 @@ public class ParticleController : MonoBehaviour {
 
 	}
 
-	public void Run()
+	public void Play()
 	{
 		foreach (ParticleSystem p in _particles)
 		{

@@ -22,7 +22,6 @@ public class DBGenerator : MonoBehaviour {
 		Counter = 0;
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate ()
 	{
 		//Create one dodgeball
@@ -56,20 +55,21 @@ public class DBGenerator : MonoBehaviour {
 			{
 				if (Dodgeballs[(int)UpdateNumbers[i]] != null)
 				{
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().transform.GetComponent<Renderer>().material = Materials[(int)UpdateNumbers[i + 1]];
+					DodgeController controller = Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>();
+					controller.transform.GetComponent<Renderer>().material = Materials[(int)UpdateNumbers[i + 1]];
 					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<SpriteRenderer>().sprite = Sprites[(int)UpdateNumbers[i + 2]];
 					Dodgeballs[(int)UpdateNumbers[i]].transform.localEulerAngles = new Vector3(0.0f, 0.0f, UpdateNumbers[i + 3]);
 					Dodgeballs[(int)UpdateNumbers[i]].transform.localPosition = new Vector3(UpdateNumbers[i + 4], UpdateNumbers[i + 5], 0.0f);
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().transform.localScale = new Vector3(UpdateNumbers[i + 6], UpdateNumbers[i + 6], 0.1f);
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Min = UpdateNumbers[i + 7];
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Max = UpdateNumbers[i + 8];
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().State = (int)UpdateNumbers[i + 9];
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().RotationSpeed = UpdateNumbers[i + 10];
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Speed = (int)UpdateNumbers[i + 11];
-					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Special = (int)UpdateNumbers[i + 12];
+					controller.transform.localScale = new Vector3(UpdateNumbers[i + 6], UpdateNumbers[i + 6], 0.1f);
+					controller.Min = UpdateNumbers[i + 7];
+					controller.Max = UpdateNumbers[i + 8];
+					controller.State = (int)UpdateNumbers[i + 9];
+					controller.RotationSpeed = UpdateNumbers[i + 10];
+					controller.Speed = (int)UpdateNumbers[i + 11];
+					controller.Special = (int)UpdateNumbers[i + 12];
 					if ((int)UpdateNumbers[i + 9] != 5)
 					{
-						Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().transform.localPosition = Vector3.zero;
+						controller.transform.localPosition = Vector3.zero;
 					}
 				}
 			}

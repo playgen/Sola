@@ -72,7 +72,7 @@ public class UpgradeController : MonoBehaviour {
 					int position = up.Previous.Length;
 					if (position < value)
 					{
-						up.Red = true;
+						up.Bought = true;
 					}
 				}
 			}
@@ -84,7 +84,6 @@ public class UpgradeController : MonoBehaviour {
 	{
 		if (up.Pressed == true && _wealth >= _minus)
 		{
-			Debug.Log(_wealth + " : " + _minus);
 			Controller.GetComponent<Controller>().Requested.Remove("coins");
 			Controller.GetComponent<Controller>().AddResource("coins", -_minus);
 			Controller.GetComponent<Controller>().GetResource("coins");
@@ -94,10 +93,10 @@ public class UpgradeController : MonoBehaviour {
 			{
 				foreach(GameObject u in up.Previous)
 				{
-					if(!u.GetComponent<Upgrade>().Red)
+					if(!u.GetComponent<Upgrade>().Bought)
 					{
 						amount++;
-						u.GetComponent<Upgrade>().Red = true;
+						u.GetComponent<Upgrade>().Bought = true;
 					}
 				}
 			}
@@ -105,10 +104,10 @@ public class UpgradeController : MonoBehaviour {
 			{
 				Controller.GetComponent<Controller>().AddResource(up.Key, amount);
 				Controller.GetComponent<Controller>().GetResource(up.Key);
-				up.Red = true;
+				up.Bought = true;
 			}
 		}
-		if(up.Red == true && up.Pressed == true)
+		if(up.Bought == true && up.Pressed == true)
 		{
 			if (up.Key == "bomb")
 			{
@@ -178,7 +177,7 @@ public class UpgradeController : MonoBehaviour {
 		_hovered = false;
 		foreach (Upgrade b in _buttons)
 		{
-			if (b.Hover && !b.Red)
+			if (b.Hover && !b.Bought)
 			{
 				_hovered = true;
 				_minus = b.Value;

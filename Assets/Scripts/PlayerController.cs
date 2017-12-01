@@ -158,24 +158,11 @@ public class PlayerController : NetworkBehaviour
 		_z = transform.GetComponent<Rigidbody>().velocity.z;
 		if (Controller.GetComponent<Controller>().Started && Controller.GetComponent<Controller>().GameOverCounter == 0)
 		{
-			if (Input.GetKey(KeyCode.W))
-			{
-				//SUG
-				_y += Speed / 10;
-
-			}
-			if (Input.GetKey(KeyCode.S))
-			{
-				_y -= Speed / 10;
-			}
-			if (Input.GetKey(KeyCode.A))
-			{
-				_x -= Speed / 10;
-			}
-			if (Input.GetKey(KeyCode.D))
-			{
-				_x += Speed / 10;
-			}
+			var x = Input.GetAxisRaw("Horizontal");
+			var y = Input.GetAxisRaw("Vertical");
+			_y = Speed * y / 10;
+			_x = Speed * x / 10;
+			// Pythag to make sure you constantly move at the right speed
 			if (_x != 0 && _y != 0)
 			{
 				_x = _x / Mathf.Abs(_x);
@@ -203,7 +190,7 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	//When hit by a dodgeball turn Damage to true
+	//When hit by a dodgeball/Ability turn Damage to true
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.tag == "DodgeBall")
@@ -311,7 +298,7 @@ public class PlayerController : NetworkBehaviour
 	}
 
 
-	//When you press B blink
+	//Blink ability
 	void Blink()
 	{
 		_abilityCounter = CounterTime;
@@ -362,7 +349,7 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	//When you press B spin
+	//Blades ability
 	void Spinners()
 	{
 		Spin.SetActive(true);
@@ -370,14 +357,14 @@ public class PlayerController : NetworkBehaviour
 		_abilityCounter = -1;
 	}
 
-	//When you press B spin
+	//Shield ability
 	void Block()
 	{
 		Shield.SetActive(true);
 		_abilityCounter = CounterTime;
 	}
 
-	//When you press B spin
+	//Explode ability
 	void Explode(Vector3 mouse, Vector3 regular)
 	{
 		GameObject bomb = Instantiate(Bomb);

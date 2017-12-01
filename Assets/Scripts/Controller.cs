@@ -42,7 +42,7 @@ public class Controller : NetworkBehaviour
 			_networkManagerGO.GetComponent<NetworkManagerHUD>().enabled = true;
 			PlayerName = SUGARManager.CurrentUser.Name;
 			LoggedIn = true;
-			Lights.GetComponent<ParticleController>().Run();
+			Lights.GetComponent<ParticleController>().Play();
 			GetResource("coins");
 			GetResource("selected");
 			GetResource("speed");
@@ -66,6 +66,7 @@ public class Controller : NetworkBehaviour
 			SUGARManager.Account.DisplayPanel(success =>
 			{
 				_networkManagerGO.GetComponent<NetworkManagerHUD>().enabled = true;
+				Lights.GetComponent<ParticleController>().Play();
 				PlayerName = SUGARManager.CurrentUser.Name;
 				LoggedIn = true;
 				GetResource("coins");
@@ -101,7 +102,7 @@ public class Controller : NetworkBehaviour
 		{
 			Run();
 		}
-		if (Input.GetKeyDown(KeyCode.K))
+		if (Input.GetKeyDown(KeyCode.P))
 		{
 			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
 			SetResource("coins", 5000);
@@ -375,7 +376,7 @@ public class Controller : NetworkBehaviour
 			if(GameOverCounter == 0)
 			{
 				GameOverCounter = 400;
-				Lights.GetComponent<ParticleController>().Run();
+				Lights.GetComponent<ParticleController>().Play();
 			}
 			else
 			{
@@ -409,7 +410,8 @@ public class Controller : NetworkBehaviour
 			_time = Time.time;
 		}
 	}
-	
+
+	// Get the value of a resource in the database
 	public void GetResource(string key)
 	{
 		if (SUGARManager.CurrentUser != null)
@@ -432,6 +434,7 @@ public class Controller : NetworkBehaviour
 		}
 	}
 
+	// Add the value of a resource in the database
 	public void AddResource(string key, float value)
 	{
 		if (SUGARManager.CurrentUser != null)
@@ -443,6 +446,7 @@ public class Controller : NetworkBehaviour
 		}
 	}
 
+	// Set the value of a resource in the database
 	public void SetResource(string key, float value)
 	{
 		if (SUGARManager.CurrentUser != null)

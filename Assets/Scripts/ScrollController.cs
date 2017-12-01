@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Attached to the scrolling text ("Connecting", "Press TAB to start", etc)
+// Also attached to the home screen buttons ("Online", "Controls", etc)
 public class ScrollController : MonoBehaviour {
 
 	public float Direction, Distance;
@@ -10,26 +12,12 @@ public class ScrollController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		if (Rotate)
-		{
-			transform.localEulerAngles = new Vector3(Direction, 0.0f, 90.0f);
-		}
-		else
-		{
-			if (Direction < 0.0f)
-			{
-				transform.localPosition = new Vector3(Distance, transform.localPosition.y, transform.localPosition.z);
-			}
-			else
-			{
-				transform.localPosition = new Vector3(-Distance, transform.localPosition.y, transform.localPosition.z);
-			}
-		}
 	}
 	
 	// Scroll across the screen in the desired direction
 	void FixedUpdate ()
 	{
+		// For the home screen buttons
 		if (Rotate)
 		{
 			transform.localEulerAngles = new Vector3(Direction, 0.0f, 90.0f);
@@ -39,9 +27,12 @@ public class ScrollController : MonoBehaviour {
 				Direction = 0.0f;
 			}
 		}
+		// For the Scrolling text
 		else
 		{
 			transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, transform.localPosition.z);
+
+			// When it reaches the end of the screen put it back on the other side to create a loop
 			if (transform.localPosition.x > Distance || transform.localPosition.x < -Distance)
 			{
 				transform.localPosition = new Vector3(-transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);

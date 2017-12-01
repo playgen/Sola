@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Controller for buttons. changes the sprite/material when hovered over and turns boolean
+// Pressed on when clicked
+
 public class ButtonController : MonoBehaviour
 {
 	public Material[] Materials;
@@ -16,8 +20,7 @@ public class ButtonController : MonoBehaviour
 		Pressed = false;
 		_hovered = false;
 	}
-
-	// Update is called once per frame
+	
 	void FixedUpdate()
 	{
 		if (_hovered)
@@ -42,14 +45,17 @@ public class ButtonController : MonoBehaviour
 				transform.GetComponent<Renderer>().material = Materials[0];
 			}
 		}
+		// Reset the hovered variable between each iteration
 		_hovered = false;
 	}
+
+	// On mouse over set hovered true
 	void OnMouseOver()
 	{
 		_hovered = true;
 	}
 
-
+	// On click set pressed true
 	void OnMouseDown()
 	{
 		Pressed = true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class controls the end game screen. Assigns the players times to the podium game obhects and sets them active
 public class WinnerScreen : MonoBehaviour {
 
 	public GameObject[] podiums;
@@ -38,6 +39,7 @@ public class WinnerScreen : MonoBehaviour {
 		}
 	}
 
+	// Hide the podiums so the next game can happen
 	public void Clear()
 	{
 		for (int i = 0; i < 4; i++)

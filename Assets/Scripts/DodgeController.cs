@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// The controller for an individual dodgeball
 public class DodgeController : MonoBehaviour
 {
 //make it so it can't fire if its not the server one
@@ -31,6 +33,7 @@ public class DodgeController : MonoBehaviour
 		transform.GetComponent<Renderer>().material = Materials[(int)MaterialNum];
 		Arrow.GetComponent<SpriteRenderer>().sprite = Sprites[(int)ArrowNum];
 		_controller = GameObject.FindGameObjectWithTag("Controller");
+		// 2 different controllers, one for single player games without all the network stuff attached and one for online 
 		if(_controller.GetComponent<Controller>().SinglePlayer)
 		{
 			_dbGenerator = GameObject.FindGameObjectWithTag("DBSGenerator");
@@ -49,6 +52,8 @@ public class DodgeController : MonoBehaviour
 		Max = 90.0f;
 		_y = 4.775f;
 		_x = 8.645f;
+		// If it is an online game add the ball to the array of balls which will be used 
+		// to send updates to clients
 		if (_dbGenerator.GetComponent<DBGenerator>().Server)
 		{
 			_dbGenerator.GetComponent<DBGenerator>().BallUpdates[BallNumber] = Parent;
@@ -59,23 +64,21 @@ public class DodgeController : MonoBehaviour
 	void FixedUpdate()
 	{
 		Players = GameObject.FindGameObjectsWithTag("Player");
+		// If it is not a special ball do nothing
 		if (Special == 0)
 		{
 			Icon.GetComponent<SpriteRenderer>().enabled = false;
 		}
+		// If it is a special ball enable the correct icon and give the value to _lastSpecial
 		else if (Special < 4)
 		{
 			Icon.GetComponent<SpriteRenderer>().enabled = true;
 			Icon.GetComponent<SpriteRenderer>().sprite = SpecialSprites[Special - 1];
 			_lastSpecial = Special;
-			if (_lastSpecial == 3)
-			{
-				_left = (Random.Range(-1, 1) > 0);
-				_stretch = transform.localScale.x;
-			}
 		}
 		else
 		{
+			// If its an invisible ball set it to the translucent sprite
 			if(_lastSpecial == 1)
 			{
 				GetComponent<MeshRenderer>().enabled = false;
@@ -124,6 +127,8 @@ public class DodgeController : MonoBehaviour
 				inArray = true;
 			}
 		}
+		//States represent different stages in the balls life
+		// Start : 0, Countdown to fire : 1 - 4, Fired - 5
 		//If the ball is facing a player and it has spawned but not yet been fired then fire
 		if (inArray && State == 0 && _fireTime == 0 && _controller.GetComponent<Controller>().Started && (_server || _controller.GetComponent<Controller>().SinglePlayer))
 		{
@@ -159,11 +164,13 @@ public class DodgeController : MonoBehaviour
 		//move the ball in the direction it was fired
 		else if (State == 5)
 		{
+			// Activate the special ball
 			if (Special != 0)
 			{
 				Special = 4;
 			}
 
+			// If it is a Multiply ball activate the other balls and fire them
 			if (_lastSpecial == 2)
 			{
 				foreach (GameObject g in Duplicates)
@@ -174,8 +181,12 @@ public class DodgeController : MonoBehaviour
 				}
 			}
 
+			// Move the dodgeball
 			transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - (Speed / 100.0f), transform.localPosition.z);
+			// Disable the arrow sprite
 			Arrow.GetComponent<SpriteRenderer>().enabled = false;
+
+			//If it is a Stretch ball stretch it out until its scale is (2, 0.5, 1) and also rotate the ball
 			if(Special == 4 && _lastSpecial == 3 && _countDown == 0)
 			{
 				if (transform.localScale.x < _stretch * 2)
@@ -203,11 +214,8 @@ public class DodgeController : MonoBehaviour
 					Angles();
 					if (inArray && State == 0 && _fireTime == 0 && _controller.GetComponent<Controller>().Started && _server)
 					{
+						// Set the state to 1 which means its preparing to fire
 						State = 1;
-						if (_dbGenerator.GetComponent<DBGenerator>().Server)
-						{
-							_dbGenerator.GetComponent<DBGenerator>().BallUpdates[BallNumber] = Parent;
-						}
 					}
 				}
 			}
@@ -228,6 +236,7 @@ public class DodgeController : MonoBehaviour
 		}
 	}
 
+	// If the ball tries to respawn in a place where there is already a dodgeball then _hit = true which will try to respawn it again
 	//If the dodgeball hits an outer wall start a countdown to respawn and change the shape and speed of the dodgeball
 	void OnTriggerEnter(Collider other)
 	{
@@ -309,7 +318,7 @@ public class DodgeController : MonoBehaviour
 		}
 	}
 
-	//Reset the dodgeball along one of the walls
+	//Reset the dodgeball along one of the walls and decides if it will be a special ball
 	void Reset()
 	{
 		if (_countDown > 0)
@@ -351,6 +360,7 @@ public class DodgeController : MonoBehaviour
 				transform.localPosition = Vector3.zero;
 				State = -1;
 				int special = Random.Range(0, 100);
+				// each special ball has a 3% probablitiy of spawning
 				if(special < 3)
 				{
 					Special = 1;
@@ -362,6 +372,8 @@ public class DodgeController : MonoBehaviour
 				else if (special < 9)
 				{
 					Special = 3;
+					_left = (Random.Range(-1, 1) > 0);
+					_stretch = transform.localScale.x;
 				}
 				else
 				{

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Controller for the shield itm. Turned on until the counter runs out and blocks attacks whilst on
 public class ShieldController : MonoBehaviour {
 
 	public GameObject Player;

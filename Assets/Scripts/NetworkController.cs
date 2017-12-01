@@ -5,13 +5,14 @@ using UnityEngine.Networking;
 
 public class NetworkController : NetworkBehaviour {
 
-	public GameObject NetworkManager, DBGenerator, Cont, Dodgeball;
+	public GameObject Cont, Dodgeball;
 	public GameObject[] Dots = new GameObject[4];
 	public Sprite[] Sprites = new Sprite[2];
 	public int Players, OldPlayers;
 	public bool Server, Client;
 
 	NetworkManager _networkManager;
+	GameObject _dBGenerator;
 	GameObject[] _updatedBalls;
 	float[] _updates;
 	int[] _lives;
@@ -21,8 +22,9 @@ public class NetworkController : NetworkBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		_updatedBalls = DBGenerator.GetComponent<DBGenerator>().BallUpdates;
-		_networkManager = NetworkManager.GetComponent<NetworkManager>();
+		_dBGenerator = GameObject.FindGameObjectWithTag("DBGenerator");
+		_updatedBalls = _dBGenerator.GetComponent<DBGenerator>().BallUpdates;
+		_networkManager = GameObject.FindGameObjectWithTag("NetworkManager").GetComponent<NetworkManager>();
 		Players = 0;
 		_temp = 0.0f;
 	}
@@ -43,7 +45,7 @@ public class NetworkController : NetworkBehaviour {
 	//Server update stuff
 	void ServerUpdate()
 	{
-		DBGenerator.GetComponent<DBGenerator>().Server = true;
+		_dBGenerator.GetComponent<DBGenerator>().Server = true;
 		int x = _networkManager.numPlayers;
 		Players = x;
 		bool start = false;
@@ -226,7 +228,7 @@ public class NetworkController : NetworkBehaviour {
 		{
 			if (length == 1)
 			{
-				NetworkManager.GetComponent<NetworkManager>().StopHost();
+				_networkManager.StopHost();
 				Cont.GetComponent<Controller>().Server = false;
 				Players = 0;
 				Server = false;
@@ -236,7 +238,7 @@ public class NetworkController : NetworkBehaviour {
 		}
 		else
 		{
-			NetworkManager.GetComponent<NetworkManager>().StopClient();
+			_networkManager.StopClient();
 			Cont.GetComponent<Controller>().Clear();
 			Players = 0;
 			Server = false;
@@ -251,6 +253,7 @@ public class NetworkController : NetworkBehaviour {
 		player.GetComponent<PlayerController>().Ability(selected, mouse, regular);
 	}
 
+	// Spawn another dodgeball (or 5)
 	public void Dodge(bool five)
 	{
 		if (five)
@@ -263,7 +266,7 @@ public class NetworkController : NetworkBehaviour {
 		}
 	}
 
-	//Standard methods of the ClientRpcs for server only users
+	//For server only users, updates itself
 	public void Updates(int x, bool start, float[] dodgeballs, int length)
 	{
 		//Send the updated values for the dodgeballs
@@ -282,6 +285,7 @@ public class NetworkController : NetworkBehaviour {
 		}
 	}
 
+	//For server only users, one player loses a life
 	public void LoseLife(int position)
 	{
 		if (Cont.GetComponent<Controller>().Players[position].GetComponent<PlayerController>().Hearts.GetComponent<HeartController>().Health != 0 && Cont.GetComponent<Controller>().Players[position].GetComponent<PlayerController>().Invincibility == 0)
@@ -291,6 +295,7 @@ public class NetworkController : NetworkBehaviour {
 		}
 	}
 
+	//For server only users, sets the players names
 	public void Names(string[] names)
 	{
 		for (int i = 0; i < Cont.GetComponent<Controller>().Players.Length; i++)
@@ -299,6 +304,8 @@ public class NetworkController : NetworkBehaviour {
 		}
 	}
 
+
+	//For server only users, resets all the players and starts the game over processes
 	public void Resets()
 	{
 		for (int i = 0; i < Cont.GetComponent<Controller>().Players.Length; i++)

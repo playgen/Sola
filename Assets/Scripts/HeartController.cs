@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Controller for a players health bar
 public class HeartController : MonoBehaviour {
 
 	public GameObject[] Hearts = new GameObject[5];

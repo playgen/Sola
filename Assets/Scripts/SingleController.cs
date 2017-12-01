@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+// Controller for single player games as a replacement for the network controller.
+// Has the same functions but they don't attempt to make any UNet connections
 public class SingleController : MonoBehaviour {
 
 	public GameObject DBGenerator, Dodgeball;
@@ -9,24 +12,28 @@ public class SingleController : MonoBehaviour {
 
 	GameObject _player;
 
-	// Use this for initialization
 	void Start()
 	{
-		_player = GameObject.FindGameObjectWithTag("Player");
 	}
 
-	// Update is called once per frame
 	void FixedUpdate()
 	{
+		// Set _player equal to the player
 		_player = GameObject.FindGameObjectWithTag("Player");
+
+		// Only execute on single player games
 		if (GetComponent<Controller>().SinglePlayer)
 		{
+			// If you press tab start a game
 			if (Input.GetKey(KeyCode.Tab) && GetComponent<Controller>().StartCounter == -1)
 			{
+				// Counter between initialization and the actual game starting
 				GetComponent<Controller>().StartCounter = 60;
 				_player.GetComponent<PlayerController>().InGame = true;
+				// Tell the dodgeball generator that the game has started
 				GameObject.FindGameObjectWithTag("DBSGenerator").GetComponent<DBGenerator>().InGame = true;
 			}
+			// When the player takes damage lose a life unless currently invunerable
 			if (_player.GetComponent<PlayerController>().Damage)
 			{
 				_player.GetComponent<PlayerController>().Damage = false;
@@ -35,6 +42,7 @@ public class SingleController : MonoBehaviour {
 		}
 	}
 
+	// If you haven't just taken damage lose a life and become invincible for 50 frames
 	public void LoseLife()
 	{
 		if (_player.GetComponent<PlayerController>().Hearts.GetComponent<HeartController>().Health != 0 && _player.GetComponent<PlayerController>().Invincibility == 0)
@@ -44,6 +52,7 @@ public class SingleController : MonoBehaviour {
 		}
 	}
 
+	// Spawn 5/1 dodgeballs depending on the parameter
 	public void Dodge(bool five)
 	{
 		if (five)
@@ -55,11 +64,10 @@ public class SingleController : MonoBehaviour {
 			GameObject.FindGameObjectWithTag("DBSGenerator").GetComponent<DBGenerator>().Pulse = true;
 		}
 	}
+
+	// Call the resetPlayer method in the playerController script
 	public void Resets()
 	{
-		for (int i = 0; i < GetComponent<Controller>().Players.Length; i++)
-		{
-			_player.GetComponent<PlayerController>().ResetPlayer();
-		}
+		_player.GetComponent<PlayerController>().ResetPlayer();
 	}
 }

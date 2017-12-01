@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Controller for the sprite animations in the shop screen
 public class ShopControllers : MonoBehaviour {
 
 	//Everyone
@@ -56,6 +57,7 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
+	// Makes the shoes run back and forth across the screen. The speed scales with the localPosition.x value
 	void Speed ()
 	{
 		if (transform.localPosition.x <= -3.65f && transform.localScale.x < 0.3f)
@@ -89,6 +91,7 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
+	// The explosion sprite animation. Just rotates it and stretches it to alter the shape whenever the counter hits 0
 	void Explosion ()
 	{
 		if (_counter == 0)
@@ -105,6 +108,7 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
+	// The blink sprite animation. Spawns in a circle around its purchase button whenever the counter hits 0
 	void Blink()
 	{
 		if (_counter == 0)
@@ -119,11 +123,13 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
+	// The blades sprite animation. Just rotates
 	void Blades()
 	{
 		transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z + Direction);
 	}
 
+	// The gun sprite animation. Fires a bullet whenever the counter hits 0 and wobbles a little
 	void Gun()
 	{
 		if (_bullet == null && _counter == 0)
@@ -159,6 +165,8 @@ public class ShopControllers : MonoBehaviour {
 			_counter--;
 		}
 	}
+
+	// The shield sprite animatioon. blinks for a few seconds whenver a bullet hits it
 	void Shield()
 	{
 		if (_counter % 20 < 10 && _counter != 0)
@@ -175,6 +183,7 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
+	// When a bullet hits the shield sprite destroy it and start the shields animation
 	void OnTriggerEnter(Collider other)
 	{
 		if(ItemNumber == 5)
