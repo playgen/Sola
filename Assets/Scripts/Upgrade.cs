@@ -26,13 +26,13 @@ public class Upgrade : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
-		if (Hover)
-		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[1];
-		}
-		else if (Selected)
+		if (Selected)
 		{
 			GetComponent<SpriteRenderer>().sprite = Sprites[3];
+		}
+		else if(Hover)
+		{
+			GetComponent<SpriteRenderer>().sprite = Sprites[1];
 		}
 		else if (Red)
 		{

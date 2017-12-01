@@ -16,6 +16,7 @@ public class Controller : NetworkBehaviour
 	public bool Started, Server, Client, LoggedIn, SinglePlayer;
 	public string PlayerName;
 
+	GameObject[] _background;
 	NetworkManager _networkManager;
 	GameObject _networkManagerGO, _player;
 	float _materialCounter, _time, _oldTime, _coins;
@@ -25,6 +26,7 @@ public class Controller : NetworkBehaviour
 	void Start()
 	{
 		_networkManagerGO = GameObject.FindGameObjectWithTag("NetworkManager");
+		_background = GameObject.FindGameObjectsWithTag("Background");
 		_networkManager = _networkManagerGO.GetComponent<NetworkManager>();
 		Requested = new Dictionary<string, float>();
 		StartCounter = -1;
@@ -43,9 +45,14 @@ public class Controller : NetworkBehaviour
 			Lights.GetComponent<ParticleController>().Run();
 			GetResource("coins");
 			GetResource("selected");
+			GetResource("speed");
 			foreach (GameObject up in Buttons)
 			{
 				GetResource(up.GetComponent<Upgrade>().Key);
+			}
+			foreach (GameObject g in _background)
+			{
+				g.GetComponent<BackgroundController>().New(2);
 			}
 		});
 	}
@@ -63,9 +70,14 @@ public class Controller : NetworkBehaviour
 				LoggedIn = true;
 				GetResource("coins");
 				GetResource("selected");
+				GetResource("speed");
 				foreach (GameObject up in Buttons)
 				{
 					GetResource(up.GetComponent<Upgrade>().Key);
+				}
+				foreach (GameObject g in _background)
+				{
+					g.GetComponent<BackgroundController>().New(2);
 				}
 			});
 
@@ -77,6 +89,10 @@ public class Controller : NetworkBehaviour
 		if (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length <= 1))
 		{
 			Clear();
+			foreach (GameObject g in _background)
+			{
+				g.GetComponent<BackgroundController>().New(0);
+			}
 		}
 		WaitScreen();
 		RankingManager();

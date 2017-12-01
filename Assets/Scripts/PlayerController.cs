@@ -26,6 +26,7 @@ public class PlayerController : NetworkBehaviour
 		//Set Initial values
 		Controller = GameObject.FindGameObjectWithTag("Controller");
 		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
+		Speed += Controller.GetComponent<Controller>().Requested["speed"];
 
 		_initialPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
 		_ability = Controller.GetComponent<Controller>().Ability.GetComponentsInChildren<Transform>();
@@ -174,6 +175,13 @@ public class PlayerController : NetworkBehaviour
 			if (Input.GetKey(KeyCode.D))
 			{
 				_x += Speed / 10;
+			}
+			if (_x != 0 && _y != 0)
+			{
+				_x = _x / Mathf.Abs(_x);
+				_y = _y / Mathf.Abs(_y);
+				_x = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _x;
+				_y = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _y;
 			}
 		}
 		transform.GetComponent<Rigidbody>().velocity = new Vector3(_x, _y, _z);

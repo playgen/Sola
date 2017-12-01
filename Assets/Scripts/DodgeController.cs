@@ -5,19 +5,19 @@ using UnityEngine;
 public class DodgeController : MonoBehaviour
 {
 //make it so it can't fire if its not the server one
-	public GameObject Arrow, Parent;
-	public Material[] Materials = new Material[7];
-	public Sprite[] Sprites = new Sprite[4];
-	public GameObject[] Players;
+	public GameObject Arrow, Parent, Icon, Invis;
+	public Material[] Materials;
+	public Sprite[] Sprites, SpecialSprites;
+	public GameObject[] Players, Duplicates;
 
 	public float RotationSpeed, Speed, ArrowNum, MaterialNum, Min, Max;
-	public int State, BallNumber;
+	public int State, BallNumber, Special;
 
-	GameObject _controller, _dbGenerator;
+	GameObject _controller, _dbGenerator, _closestPlayer;
 	float[] _angles;
-	float _x, _y, _secondAngle, _varRandom, _rotationAngle;
-	int _fireTime, _origTime, _counter, _countDown;
-	bool _hit, _server;
+	float _x, _y, _secondAngle, _varRandom, _rotationAngle, _stretch;
+	int _fireTime, _origTime, _counter, _countDown, _lastSpecial, _multi;
+	bool _hit, _server, _left;
 
 	// Gives the ball a random size and speed
 	void Start()
@@ -40,8 +40,10 @@ public class DodgeController : MonoBehaviour
 			_dbGenerator = GameObject.FindGameObjectWithTag("DBGenerator");
 		}
 		_hit = false;
+		_left = false;
 		State = -1;
 		_counter = 0;
+		_multi = 0;
 		_countDown = 1;
 		Min = -90.0f;
 		Max = 90.0f;
@@ -56,13 +58,37 @@ public class DodgeController : MonoBehaviour
 	// Main code for the dodgeball
 	void FixedUpdate()
 	{
+		Players = GameObject.FindGameObjectsWithTag("Player");
+		if (Special == 0)
+		{
+			Icon.GetComponent<SpriteRenderer>().enabled = false;
+		}
+		else if (Special < 4)
+		{
+			Icon.GetComponent<SpriteRenderer>().enabled = true;
+			Icon.GetComponent<SpriteRenderer>().sprite = SpecialSprites[Special - 1];
+			_lastSpecial = Special;
+			if (_lastSpecial == 3)
+			{
+				_left = (Random.Range(-1, 1) > 0);
+				_stretch = transform.localScale.x;
+			}
+		}
+		else
+		{
+			if(_lastSpecial == 1)
+			{
+				GetComponent<MeshRenderer>().enabled = false;
+				Icon.GetComponent<SpriteRenderer>().enabled = false;
+				Invis.GetComponent<SpriteRenderer>().enabled = true;
+			}
+		}
 		if (_dbGenerator.GetComponent<DBGenerator>().Server)
 		{
 			_dbGenerator.GetComponent<DBGenerator>().BallUpdates[BallNumber] = Parent;
 		}
 		Arrow.GetComponent<SpriteRenderer>().enabled = true;
 		_server = _dbGenerator.GetComponent<DBGenerator>().Server;
-		Players = GameObject.FindGameObjectsWithTag("Player");
 		//Just in case a ball spawns when theres no player. stops an error being thrown
 		if (Players == null)
 		{
@@ -133,8 +159,38 @@ public class DodgeController : MonoBehaviour
 		//move the ball in the direction it was fired
 		else if (State == 5)
 		{
+			if (Special != 0)
+			{
+				Special = 4;
+			}
+
+			if (_lastSpecial == 2)
+			{
+				foreach (GameObject g in Duplicates)
+				{
+					g.SetActive(true);
+					g.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - (Speed / 100.0f), transform.localPosition.z);
+					g.GetComponent<Renderer>().material = GetComponent<Renderer>().material;
+				}
+			}
+
 			transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - (Speed / 100.0f), transform.localPosition.z);
 			Arrow.GetComponent<SpriteRenderer>().enabled = false;
+			if(Special == 4 && _lastSpecial == 3 && _countDown == 0)
+			{
+				if (transform.localScale.x < _stretch * 2)
+				{
+					transform.localScale = new Vector3(transform.localScale.x + (_stretch / 50.0f), transform.localScale.y - (_stretch / 100.0f), transform.localScale.z);
+				}
+				if(_left)
+				{
+					transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z - 2.0f);
+				}
+				else
+				{
+					transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z + 2.0f);
+				}
+			}
 		}
 		else
 		{
@@ -185,12 +241,19 @@ public class DodgeController : MonoBehaviour
 			Speed = 10 + _varRandom * 10.0f;
 			RotationSpeed = 1.7f + 1.7f * _varRandom;
 			transform.localScale = new Vector3(1.0f - 0.7f * _varRandom, 1.0f - 0.7f * _varRandom, 0.1f);
+			transform.localEulerAngles = Vector3.zero;
 			ArrowNum = Random.Range(0, 4);
 			MaterialNum = Random.Range(0, 7);
 			transform.GetComponent<Renderer>().material = Materials[(int) MaterialNum];
 			Arrow.GetComponent<SpriteRenderer>().sprite = Sprites[(int)ArrowNum];
 			_countDown = Random.Range(30, 70);
 			GetComponent<MeshRenderer>().enabled = false;
+			Invis.GetComponent<SpriteRenderer>().enabled = false;
+			foreach (GameObject g in Duplicates)
+			{
+				g.SetActive(false);
+				g.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+			}
 		}
 	}
 
@@ -287,6 +350,23 @@ public class DodgeController : MonoBehaviour
 				}
 				transform.localPosition = Vector3.zero;
 				State = -1;
+				int special = Random.Range(0, 100);
+				if(special < 3)
+				{
+					Special = 1;
+				}
+				else if (special < 6)
+				{
+					Special = 2;
+				}
+				else if (special < 9)
+				{
+					Special = 3;
+				}
+				else
+				{
+					Special = 0;
+				}
 				if (_dbGenerator.GetComponent<DBGenerator>().Server)
 				{
 					_dbGenerator.GetComponent<DBGenerator>().BallUpdates[BallNumber] = Parent;

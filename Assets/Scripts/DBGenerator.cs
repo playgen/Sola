@@ -52,7 +52,7 @@ public class DBGenerator : MonoBehaviour {
 		//Update each dodgeball from the info sent by the server
 		if (UpdateNumbers.Length > 0 && !Server && InGame)
 		{
-			for (int i = 0; i < UpdateNumbers.Length; i = i + 12)
+			for (int i = 0; i < UpdateNumbers.Length; i = i + 13)
 			{
 				if (Dodgeballs[(int)UpdateNumbers[i]] != null)
 				{
@@ -66,6 +66,7 @@ public class DBGenerator : MonoBehaviour {
 					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().State = (int)UpdateNumbers[i + 9];
 					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().RotationSpeed = UpdateNumbers[i + 10];
 					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Speed = (int)UpdateNumbers[i + 11];
+					Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().Special = (int)UpdateNumbers[i + 12];
 					if ((int)UpdateNumbers[i + 9] != 5)
 					{
 						Dodgeballs[(int)UpdateNumbers[i]].GetComponentInChildren<DodgeController>().transform.localPosition = Vector3.zero;

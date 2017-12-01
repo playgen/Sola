@@ -122,9 +122,9 @@ public class NetworkController : NetworkBehaviour {
 				_length++;
 			}
 		}
-		_updates = new float[_length * 12];
+		_updates = new float[_length * 13];
 		int q = 0;
-		for (int i = 0; i < _length * 12; i = i + 12)
+		for (int i = 0; i < _length * 13; i = i + 13)
 		{
 			if (_updatedBalls[q] != null)
 			{
@@ -140,6 +140,7 @@ public class NetworkController : NetworkBehaviour {
 				_updates[i + 9] = _updatedBalls[q].GetComponentInChildren<DodgeController>().State;
 				_updates[i + 10] = _updatedBalls[q].GetComponentInChildren<DodgeController>().RotationSpeed;
 				_updates[i + 11] = _updatedBalls[q].GetComponentInChildren<DodgeController>().Speed;
+				_updates[i + 12] = _updatedBalls[q].GetComponentInChildren<DodgeController>().Special;
 				_updatedBalls[q] = null;
 			}
 			else

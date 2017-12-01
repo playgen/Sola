@@ -9,21 +9,28 @@ public class TitleScreenController : MonoBehaviour {
 	public Material[] Materials;
 	public bool SinglePlayer;
 
+	GameObject[] _background;
 	GameObject _networkManager;
-	bool _started;
+	bool _started, _stop;
 
 	// Use this for initialization
 	void Start () {
 		_networkManager = GameObject.FindGameObjectWithTag("NetworkManager");
+		_background = GameObject.FindGameObjectsWithTag("Background");
 		_started = false;
+		_stop = false;
 	}
 
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		if (!_started && GetComponent<Controller>().LoggedIn)
+		if(Store.activeSelf && !_stop)
 		{
 			Lights.GetComponent<ParticleController>().Run();
+			_stop = true;
+		}
+		if (!_started && GetComponent<Controller>().LoggedIn)
+		{
 			_started = true;
 			Store.SetActive(true);
 			Single.SetActive(true);
@@ -40,6 +47,7 @@ public class TitleScreenController : MonoBehaviour {
 			Controls.SetActive(false);
 			Shop.SetActive(true);
 			BackTL.SetActive(true);
+			Transition(2);
 		}
 		if (Online.GetComponent<ButtonController>().Pressed == true)
 		{
@@ -53,6 +61,7 @@ public class TitleScreenController : MonoBehaviour {
 			Single.SetActive(false);
 			Online.SetActive(false);
 			Controls.SetActive(false);
+			Transition(2);
 		}
 		if (Back.GetComponent<ButtonController>().Pressed == true)
 		{
@@ -65,11 +74,13 @@ public class TitleScreenController : MonoBehaviour {
 			Single.SetActive(true);
 			Online.SetActive(true);
 			Controls.SetActive(true);
+			Transition(1);
 		}
 		if (Host.GetComponent<ButtonController>().Pressed == true)
 		{
 			Host.transform.GetComponent<Renderer>().material = Materials[0];
 			Lights.GetComponent<ParticleController>().Stop();
+			_stop = false;
 			Host.GetComponent<ButtonController>().Pressed = false;
 			_networkManager.GetComponent<NetworkManager>().StartHost();
 			NetworkServer.Spawn(NetworkController);
@@ -81,6 +92,7 @@ public class TitleScreenController : MonoBehaviour {
 		{
 			Join.transform.GetComponent<Renderer>().material = Materials[0];
 			Lights.GetComponent<ParticleController>().Stop();
+			_stop = false;
 			_networkManager.GetComponent<NetworkManager>().StartClient();
 			PTC.SetActive(true);
 			Connecting.SetActive(true);
@@ -93,12 +105,14 @@ public class TitleScreenController : MonoBehaviour {
 		{
 			Single.transform.GetComponent<Renderer>().material = Materials[0];
 			Lights.GetComponent<ParticleController>().Stop();
+			_stop = false;
 			Single.GetComponent<ButtonController>().Pressed = false;
 			SinglePlayer = true;
 			Store.SetActive(false);
 			Single.SetActive(false);
 			Online.SetActive(false);
 			Controls.SetActive(false);
+			Transition(2);
 		}
 		if (Controls.GetComponent<ButtonController>().Pressed == true)
 		{
@@ -110,6 +124,7 @@ public class TitleScreenController : MonoBehaviour {
 			Single.SetActive(false);
 			Online.SetActive(false);
 			BackTL.SetActive(true);
+			Transition(2);
 		}
 		if (BackTL.GetComponent<ButtonController>().Pressed == true)
 		{
@@ -121,12 +136,14 @@ public class TitleScreenController : MonoBehaviour {
 			Single.SetActive(true);
 			Online.SetActive(true);
 			Controls.SetActive(true);
+			Transition(1);
 		}
 		if (Input.GetKeyDown(KeyCode.Escape) && Connecting.activeSelf)
 		{
 			_networkManager.GetComponent<NetworkManager>().StopClient();
 			PTC.SetActive(false);
 			Connecting.SetActive(false);
+			Transition(1);
 		}
 		if (NetworkController.GetComponent<NetworkController>().Server || NetworkController.GetComponent<NetworkController>().Client)
 		{
@@ -144,5 +161,16 @@ public class TitleScreenController : MonoBehaviour {
 		Single.SetActive(true);
 		Online.SetActive(true);
 		Controls.SetActive(true);
+		Shop.SetActive(false);
+		BackTL.SetActive(false);
+		Guide.SetActive(false);
+	}
+
+	public void Transition(int i)
+	{
+		foreach (GameObject g in _background)
+		{
+			g.GetComponent<BackgroundController>().New(i - 1);
+		}
 	}
 }

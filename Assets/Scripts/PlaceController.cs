@@ -29,7 +29,8 @@ public class PlaceController : MonoBehaviour {
 		{
 			Numbers[i].GetComponent<SpriteRenderer>().sprite = Sprites[int.Parse(scoreString.Substring(i, 1))];
 		}
-		foreach(GameObject s in Stripes)
+		Player.transform.localEulerAngles = new Vector3(0.0f, 0.0f, Player.transform.localEulerAngles.z + 2.0f);
+		foreach (GameObject s in Stripes)
 		{
 			s.GetComponent<Renderer>().material = Player.GetComponent<PlayerController>().Stripes[0].GetComponent<Renderer>().material;
 		}
