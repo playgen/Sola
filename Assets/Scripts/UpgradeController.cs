@@ -26,12 +26,12 @@ public class UpgradeController : MonoBehaviour {
 		_justHovered = 0;
 		_minus = 0.0f;
 		_wealthString = _wealth.ToString();
-		while (_wealthString.Length < 8)
+		while (_wealthString.Length < 7)
 		{
 			_wealthString = "0" + _wealthString;
 		}
-		//It will cut off at 8 digits. Make it so that it either has a coin cap or makes it clear
-		for (int i = 0; i < 13; i++)
+		//It will cut off at 7 digits
+		for (int i = 0; i < Positions.Length; i++)
 		{
 			_values[i] = GameObject.Instantiate(Numbers[0]);
 			_values[i].transform.position = Positions[i].transform.position;
@@ -156,13 +156,8 @@ public class UpgradeController : MonoBehaviour {
 		{
 			Chest.GetComponent<SpriteRenderer>().sprite = ChestSprite[0];
 		}
-		_newValue = 0;
-		if (Int32.Parse(_wealthString) != (_wealth - _minus))
-		{
-			_newValue = 1;
-		}
 		_wealthString = (_wealth - _minus).ToString();
-		while (_wealthString.Length < 8)
+		while (_wealthString.Length < 7)
 		{
 			_wealthString = "0" + _wealthString;
 		}
@@ -171,8 +166,6 @@ public class UpgradeController : MonoBehaviour {
 		{
 			_wealthString = "-" + _wealthString.Substring(0, index) + _wealthString.Substring(index + 1, _wealthString.Length - (index + 1));
 		}
-		//It will cut off at 8 digits. Make it so that it either has a coin cap or makes it clear
-		FlipNumbers(0, 8, _wealthString, _newValue);
 
 		_hovered = false;
 		foreach (Upgrade b in _buttons)
@@ -197,13 +190,14 @@ public class UpgradeController : MonoBehaviour {
 		}
 
 		_minusString = _minus.ToString();
-		while (_minusString.Length < 5)
+		while (_minusString.Length < 7)
 		{
 			_minusString = "0" + _minusString;
 		}
-		FlipNumbers(8, 13, _minusString, (_justHovered % 2));
 
-		if (_justHovered == 1)
+		int send = _justHovered % 2;
+		// 1 means just covered, 2 means covering, 3 means just stopped covering & 0 means not covering
+		if (_justHovered == 1 && Mathf.Abs(_values[7].transform.localEulerAngles.x) < 0.04)
 		{
 			_justHovered = 2;
 		}
@@ -211,11 +205,16 @@ public class UpgradeController : MonoBehaviour {
 		{
 			_justHovered = 0;
 		}
+
+		// 7 Digits for your wealth and 7 for the price
+		FlipNumbers(0, 7, _wealthString, send);
+		FlipNumbers(7, Positions.Length, _minusString, send);
+
 	}
 
 	void FlipNumbers(int start, int end, string comparison, int pass)
 	{
-		//It will cut off at 8 digits. Make it so that it either has a coin cap or makes it clear
+		//It will cut off at 7 digits. Make it so that it either has a coin cap or makes it clear
 		for (int i = start; i < end; i++)
 		{
 			try

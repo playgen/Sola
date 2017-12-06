@@ -49,13 +49,9 @@ public class BackgroundController : MonoBehaviour {
 		}
 
 		// First Transition
-		// Called when you leave the home page
+		// Called when you go to the Home Page
 		if (_transition[0])
 		{
-			if (transform.localEulerAngles.z == 0.0f)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -6);
-			}
 			_yValue -= 0.043f;
 			if(transform.localPosition.y < -7.75f)
 			{
@@ -65,19 +61,15 @@ public class BackgroundController : MonoBehaviour {
 			transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z + 0.5f);
 			if(transform.localEulerAngles.z > 180.0f || transform.localEulerAngles.z < 0.0f)
 			{
-				transform.localPosition = new Vector3(transform.localPosition.x, _original, transform.localPosition.z);
+				_yValue = _original;
 				transform.localEulerAngles = Vector3.zero;
 				_transition[0] = false;
 			}
 		}
 		// Second Transition
-		// Called when you go to the Home Page
+		// Called when you leave the home page
 		if (_transition[1])
 		{
-			if (transform.localEulerAngles.y == 0.0f)
-			{
-				transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -8);
-			}
 			transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z + 0.1f);
 			transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y + 1.0f, transform.localEulerAngles.z);
 			if (transform.localEulerAngles.y > 180.0f || transform.localEulerAngles.y < 0.0f)
@@ -86,6 +78,7 @@ public class BackgroundController : MonoBehaviour {
 				_transition[1] = false;
 			}
 		}
+		
 		// Either set the scroll speed with the third transition or the normal values
 		if (_transition[2])
 		{
@@ -104,7 +97,7 @@ public class BackgroundController : MonoBehaviour {
 		}
 	}
 
-	// Start a new transition on if there is not one currently happening
+	// Start a new transition only if there is not one currently happening
 	public void New(int i)
 	{
 		if (_transition[3])

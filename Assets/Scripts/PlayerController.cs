@@ -7,14 +7,14 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
 	public float Speed, Time;
-	public GameObject Hearts, Controller, Spin, Shield, Bomb, Bullet;
+	public GameObject Hearts, Controller, Spin, Shield, Bomb, Bullet, ScoreDisplay;
 	public bool Server, Client, InGame, Damage;
 	public string Name;
 	public GameObject[] Stripes = new GameObject[2];
 	public Material[] Materials = new Material[5];
-	public int Invincibility, Health, State, CounterTime;
+	public int Invincibility, Health, State, CounterTime, Score;
 
-	private int _abilityCounter, _spinCounter;
+	private int _abilityCounter, _spinCounter, _colour;
 	private float _x, _y, _z;
 	private bool _connected;
 	private Vector3 _initialPosition;
@@ -38,18 +38,23 @@ public class PlayerController : NetworkBehaviour
 		InGame = false;
 		Server = false;
 		Client = false;
+		Score = 0;
 		State = 0;
 		Name = "";
 		Time = 99999;
+		
 	}
 
 	// Update is called once per frame
 	void FixedUpdate()
 	{
+		Score = ScoreDisplay.GetComponent<PlaceController>().Score;
+		_colour = Hearts.GetComponent<HeartController>().Place;
 		Health = Hearts.GetComponent<HeartController>().Health;
 		transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z - 2.0f);
 		transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
+		SetColour();
 		Invinc();
 		OutOfTheWay();
 
@@ -103,9 +108,8 @@ public class PlayerController : NetworkBehaviour
 	//Set Players Colour
 	public void SetColour()
 	{
-		Stripes[0].GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
-		Stripes[1].GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
-		Hearts.GetComponent<HeartController>().Marker.GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
+		GetComponent<Renderer>().material = Materials[_colour];
+		ScoreDisplay.GetComponent<PlaceController>().Offset = _colour * 10;
 	}
 
 	//Send Players Name to the Server
@@ -135,15 +139,15 @@ public class PlayerController : NetworkBehaviour
 		{
 			if (Invincibility % 10 > 5)
 			{
-				Stripes[0].GetComponent<Renderer>().material = Materials[4];
-				Stripes[1].GetComponent<Renderer>().material = Materials[4];
-				GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
+				Stripes[0].GetComponent<Renderer>().material = Materials[_colour];
+				Stripes[1].GetComponent<Renderer>().material = Materials[_colour];
+				GetComponent<Renderer>().material = Materials[4];
 			}
 			else
 			{
-				Stripes[0].GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
-				Stripes[1].GetComponent<Renderer>().material = Materials[Hearts.GetComponent<HeartController>().Place];
-				GetComponent<Renderer>().material = Materials[4];
+				Stripes[0].GetComponent<Renderer>().material = Materials[4];
+				Stripes[1].GetComponent<Renderer>().material = Materials[4];
+				GetComponent<Renderer>().material = Materials[_colour];
 			}
 			Invincibility--;
 		}
@@ -368,6 +372,7 @@ public class PlayerController : NetworkBehaviour
 	void Explode(Vector3 mouse, Vector3 regular)
 	{
 		GameObject bomb = Instantiate(Bomb);
+		bomb.transform.position = transform.position;
 		_abilityCounter = CounterTime;
 
 		float angle;

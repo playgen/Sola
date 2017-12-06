@@ -5,7 +5,7 @@ using UnityEngine;
 // This class controls the end game screen. Assigns the players times to the podium game obhects and sets them active
 public class WinnerScreen : MonoBehaviour {
 
-	public GameObject[] podiums;
+	public GameObject[] Podiums;
 	bool _running;
 	// Use this for initialization
 	void Start () {
@@ -14,27 +14,32 @@ public class WinnerScreen : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
 	public void Run(GameObject[] Players)
 	{
 		if(!_running)
 		{
-			ArrayList times = new ArrayList();
+			ArrayList rankings = new ArrayList();
 			for (int i = 0; i < Players.Length; i++)
 			{
-				times.Add(Players[i].GetComponent<PlayerController>().Time);
+				rankings.Add(Players[i]);
 			}
-			times.Sort();
 			for (int j = 0; j < Players.Length; j++)
 			{
-				int offset = 4 - Players.Length;
-				int position = times.IndexOf(Players[j].GetComponent<PlayerController>().Time);
-				int score = (int)((float)times[position]);
-				podiums[position + offset].SetActive(true);
-				podiums[position + offset].GetComponent<PlaceController>().Player = Players[j];
-				podiums[position + offset].GetComponent<PlaceController>().Score = score;
+				GameObject best = (GameObject) rankings[0];
+				for (int k = 0; k < rankings.Count; k++)
+				{
+					if (((GameObject) rankings[k]).GetComponent<PlayerController>().Score > best.GetComponent<PlayerController>().Score)
+					{
+						best = Players[k];
+					}
+				}
+				PlaceController placeCon = Podiums[j].GetComponent<PlaceController>();
+				placeCon.Score = best.GetComponent<PlayerController>().Score;
+				placeCon.Player.GetComponent<Renderer>().material = best.GetComponent<Renderer>().material;
+				placeCon.EndScreen();
+				rankings.Remove(best);
 			}
 		}
 	}
@@ -42,9 +47,10 @@ public class WinnerScreen : MonoBehaviour {
 	// Hide the podiums so the next game can happen
 	public void Clear()
 	{
-		for (int i = 0; i < 4; i++)
+		for (int j = 0; j < Podiums.Length; j++)
 		{
-			podiums[i].SetActive(false);
+			PlaceController placeCon = Podiums[j].GetComponent<PlaceController>();
+			placeCon.Reposition();
 		}
 	}
 }

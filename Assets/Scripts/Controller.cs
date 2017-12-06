@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
-	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, NetController, Rankings, PlayerOffline, Ability, GameTime, Lights;
+	public GameObject One, Two, Three, Wait, Host, Tab, Dots, Text, NetController, Rankings, PlayerOffline, Ability, Lights;
 	public GameObject[] Players, Buttons, DBGS;
 	public int[] Positions;
 
@@ -21,6 +21,7 @@ public class Controller : NetworkBehaviour
 	GameObject _networkManagerGO, _player;
 	float _materialCounter, _time, _oldTime, _coins;
 	bool _waiting, _running;
+	int _timeDiff;
 
 	// Use this for initialization
 	void Start()
@@ -87,7 +88,7 @@ public class Controller : NetworkBehaviour
 		Players = GameObject.FindGameObjectsWithTag("Player");
 		Server = NetController.GetComponent<NetworkController>().Server;
 		Client = NetController.GetComponent<NetworkController>().Client;
-		if (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length <= 1))
+		if (LoggedIn && (Input.GetKey(KeyCode.Escape) || (Client && !Server && Players.Length <= 1)))
 		{
 			Clear();
 			foreach (GameObject g in _background)
@@ -105,7 +106,11 @@ public class Controller : NetworkBehaviour
 		if (Input.GetKeyDown(KeyCode.P))
 		{
 			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
-			SetResource("coins", 5000);
+		}
+		if (Input.GetKeyDown(KeyCode.L))
+		{
+			SUGARManager.UserFriend.Display();
+			;
 		}
 	}
 
@@ -142,6 +147,10 @@ public class Controller : NetworkBehaviour
 		foreach (GameObject b in balls)
 		{
 			Destroy(b);
+		}
+		foreach (GameObject p in Players)
+		{
+			p.GetComponent<PlayerController>().ScoreDisplay.GetComponent<PlaceController>().Score = 0;
 		}
 		GetComponent<WinnerScreen>().Clear();
 	}
@@ -334,8 +343,9 @@ public class Controller : NetworkBehaviour
 	//Runs only whilst the game is going on
 	void Run()
 	{
-		float time = ((float)((int)(10.0f * (Time.time - _time))) / 10.0f);
-		GameTime.SetActive(true);
+		float time = Time.time;
+		int milliseconds = ((int)((time - _time) * 100));
+		time = ((float)((int)(10.0f * (time - _time))) / 10.0f);
 		if (_oldTime != time && time % 5.0f == 0.0f && time <= 100.0f && Server && time != 0.0f)
 		{
 			NetController.GetComponent<NetworkController>().RpcDodge(false);
@@ -352,18 +362,29 @@ public class Controller : NetworkBehaviour
 		bool gameOver = true;
 		for (int z = 0; z < Players.Length; z++)
 		{
-			if (Players[Positions[z]].GetComponent<PlayerController>().Health != 0)
+			PlayerController pCont = Players[Positions[z]].GetComponent<PlayerController>();
+			if (pCont.Health != 0)
 			{
 				gameOver = false;
-				Players[Positions[z]].GetComponent<PlayerController>().Time = time;
+				pCont.Time = time;
+				if (milliseconds > 2)
+				{
+					pCont.ScoreDisplay.GetComponent<PlaceController>().Score += milliseconds - _timeDiff;
+				}
 			}
 		}
 		if (_player.GetComponent<PlayerController>().State == 1)
 		{
 			if (SUGARManager.CurrentUser != null)
 			{
-				SUGARManager.Resource.Add("coins", (long) ((int) _oldTime), success =>
+				long score = _player.GetComponent<PlayerController>().ScoreDisplay.GetComponent<PlaceController>().Score;
+				if (score + Requested["coins"] > 9999999)
 				{
+					score = 9999999 - (long) Requested["coins"];
+				}
+				SUGARManager.Resource.Add("coins", score, success =>
+				{
+					GetResource("coins");
 					Debug.Log(success);
 				});
 				SUGARManager.GameData.Send("time", _oldTime);
@@ -389,7 +410,6 @@ public class Controller : NetworkBehaviour
 			{
 				GameOverCounter = 0;
 			}
-			GameTime.GetComponent<PlaceController>().Score = (int)time;
 		}
 		if (gameOver && Server && GameOverCounter == 0)
 		{
@@ -409,6 +429,7 @@ public class Controller : NetworkBehaviour
 		{
 			_time = Time.time;
 		}
+		_timeDiff = milliseconds;
 	}
 
 	// Get the value of a resource in the database

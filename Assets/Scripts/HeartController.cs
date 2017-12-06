@@ -8,7 +8,7 @@ public class HeartController : MonoBehaviour {
 
 	public GameObject[] Hearts = new GameObject[5];
 	public Sprite[] Sprites = new Sprite[2];
-	public GameObject Player, Marker;
+	public GameObject Player;
 	public int Health, Place;
 
 	// Use this for initialization
