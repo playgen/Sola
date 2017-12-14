@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 public class TitleScreenController : MonoBehaviour {
 
 	public GameObject Store, Shop, Single, Online, Controls, Host, Join, Back, NetworkController, Connecting, PTC, BackTL, Guide, Lights, Title;
+	public GameObject[] GameModes;
 	public Material[] Materials;
 	public bool SinglePlayer;
 
@@ -23,7 +24,7 @@ public class TitleScreenController : MonoBehaviour {
 		_stop = false;
 	}
 
-	// Update is called once per frame
+	// Each time you press a button move to the correct menu page
 	void FixedUpdate()
 	{
 		// Called when you quit a game you're in
@@ -96,6 +97,11 @@ public class TitleScreenController : MonoBehaviour {
 			// Respawns the networkcontroller on the server so you can pass messages to clients
 			_networkManager.GetComponent<NetworkManager>().StartHost();
 			NetworkServer.Spawn(NetworkController);
+			foreach (GameObject g in GameModes)
+			{
+				GameObject mode = GameObject.Instantiate(g);
+				NetworkServer.Spawn(mode);
+			}
 			Host.SetActive(false);
 			Join.SetActive(false);
 			Back.SetActive(false);
@@ -185,9 +191,15 @@ public class TitleScreenController : MonoBehaviour {
 		Title.SetActive(true);
 		Online.SetActive(true);
 		Controls.SetActive(true);
+		PTC.SetActive(false);
+		Connecting.SetActive(false);
 		Shop.SetActive(false);
 		BackTL.SetActive(false);
 		Guide.SetActive(false);
+		Host.SetActive(false);
+		Join.SetActive(false);
+		Back.SetActive(false);
+		SinglePlayer = false;
 	}
 
 	// Request a background transition

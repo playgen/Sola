@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Controller for the background cubes
+//Controller for the background cubes/ Transitions
 public class BackgroundController : MonoBehaviour {
 
-	public float X, Y;
+	public float X;
 	public Material[] Colours;
 
 	bool[] _transition;
@@ -35,16 +35,15 @@ public class BackgroundController : MonoBehaviour {
 		if (_transition[3])
 		{
 			_xValue += X;
-			_yValue += Y;
 		}
-		// TODO resort alignment after log in
 
 		// Once a block reaches the end of the screen move it to the other side and set it to another colour
 		if (_xValue > 11f || _xValue < -11f)
 		{
 			_xValue = 11f * (-_xValue / Mathf.Abs(_xValue));
+			// Pick a random colour
 			GetComponent<Renderer>().material = Colours[Random.Range(0, Colours.Length)];
-			// End transition 2
+			// End transition 2 when the cube reaches one side of the screen
 			_transition[2] = false;
 		}
 
@@ -85,7 +84,6 @@ public class BackgroundController : MonoBehaviour {
 			// Third Transition
 			// Called after you log in
 			_fx += X;
-			_fy += Y;
 			transform.localPosition = new Vector3(_fx, _fy, transform.localPosition.z);
 		}
 		else
@@ -100,6 +98,7 @@ public class BackgroundController : MonoBehaviour {
 	// Start a new transition only if there is not one currently happening
 	public void New(int i)
 	{
+		// Transition 3 is the opening sequence. This can be cut short to make way for a different one
 		if (_transition[3])
 		{
 			_transition[3] = false;
@@ -107,6 +106,7 @@ public class BackgroundController : MonoBehaviour {
 		// Check that no transition is currently happening
 		int any = Currently();
 		bool current = (any == 0);
+		// Check all other background cubes as the whole sequence should be finished before moving on
 		foreach(GameObject g in _others)
 		{
 			if(g.GetComponent<BackgroundController>().Currently() != 0 && g.GetComponent<BackgroundController>().Currently() != i + 1)

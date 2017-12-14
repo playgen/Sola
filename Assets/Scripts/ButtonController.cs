@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 
 // Controller for buttons. changes the sprite/material when hovered over and turns boolean
 // Pressed on when clicked
 
-public class ButtonController : MonoBehaviour
+public class ButtonController : NetworkBehaviour
 {
 	public Material[] Materials;
 	public Sprite[] Sprites;
-	public bool Pressed, Sprite;
+	public bool Pressed, Sprite, On, Network;
 
 	bool _hovered;
 
@@ -23,7 +24,8 @@ public class ButtonController : MonoBehaviour
 	
 	void FixedUpdate()
 	{
-		if (_hovered)
+		// Whilst the mouse is over the button display the correct Sprite/Material or it is forced on
+		if ((_hovered && !Network) || On)
 		{
 			if (Sprite)
 			{
@@ -34,6 +36,7 @@ public class ButtonController : MonoBehaviour
 				transform.GetComponent<Renderer>().material = Materials[1];
 			}
 		}
+		// Otherwise display the normal Sprite/Material
 		else
 		{
 			if (Sprite)
@@ -47,6 +50,12 @@ public class ButtonController : MonoBehaviour
 		}
 		// Reset the hovered variable between each iteration
 		_hovered = false;
+
+		// If the button is also shown to clients update them
+		if(Network && isServer)
+		{
+			RpcOn(On);
+		}
 	}
 
 	// On mouse over set hovered true
@@ -59,5 +68,13 @@ public class ButtonController : MonoBehaviour
 	void OnMouseDown()
 	{
 		Pressed = true;
+	}
+
+
+	//Update buttons on client
+	[ClientRpc]
+	public void RpcOn(bool on)
+	{
+		On = on;
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Controller for the shield itm. Turned on until the counter runs out and blocks attacks whilst on
+// Controller for the shield item. Turned on until the counter runs out and blocks attacks whilst on
 public class ShieldController : MonoBehaviour {
 
 	public GameObject Player;
@@ -15,7 +15,7 @@ public class ShieldController : MonoBehaviour {
 		_count = Counter;
 	}
 	
-	// Update is called once per frame
+	// Stay active until the counter runs out
 	void FixedUpdate () {
 		if (_count == 0)
 		{

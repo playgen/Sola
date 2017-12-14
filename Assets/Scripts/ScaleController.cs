@@ -12,7 +12,7 @@ public class ScaleController : MonoBehaviour {
 		_initial = 1.778417f;
 	}
 	
-	// Scale everything to the correct size
+	// Scale the camera to fit the aspect ratio
 	void FixedUpdate () {
 		_ratio = ((float) Screen.width) / ((float)Screen.height);
 		GetComponent<Camera>().orthographicSize = 5 / (_ratio / _initial);

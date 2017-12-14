@@ -31,6 +31,7 @@ public class ShopControllers : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		// Call the correct animation for each shop item
 		if(ItemNumber == 0)
 		{
 			Speed();
@@ -55,11 +56,20 @@ public class ShopControllers : MonoBehaviour {
 		{
 			Shield();
 		}
+		else if (ItemNumber == 6)
+		{
+			Heart();
+		}
+		else if (ItemNumber == 7)
+		{
+			Tiny();
+		}
 	}
 
 	// Makes the shoes run back and forth across the screen. The speed scales with the localPosition.x value
 	void Speed ()
 	{
+		// If the sprite is all the way left or right flip it so it can go in the other direction
 		if (transform.localPosition.x <= -3.65f && transform.localScale.x < 0.3f)
 		{
 			transform.localScale = new Vector3(transform.localScale.x + 0.01f, transform.localScale.y, transform.localScale.z);
@@ -68,13 +78,16 @@ public class ShopControllers : MonoBehaviour {
 		{
 			transform.localScale = new Vector3(transform.localScale.x - 0.01f, transform.localScale.y, transform.localScale.z);
 		}
+		// Mild delay
 		else if (_counter > 0 && transform.localPosition.x <= -3.65f && transform.localScale.x == 0.3f)
 		{
 			_counter--;
 		}
 		else
 		{
+			// Move from right to left going faster the further right you are
 			float scalar = 1 - ((3.6f - transform.localPosition.x) / (3.6f + 3.65f));
+			// Minimum speed
 			if (scalar < 0.2)
 			{
 				scalar = 0.2f;
@@ -96,6 +109,7 @@ public class ShopControllers : MonoBehaviour {
 	{
 		if (_counter == 0)
 		{
+			// Giving the explosion a random height, width and rotation makes each one look different
 			_explosionW = Random.Range(-0.50f, 0.50f);
 			_explosionH = Random.Range(-0.50f, 0.50f);
 			transform.localScale = new Vector3(_explosionW, _explosionH, transform.localScale.z);
@@ -113,6 +127,7 @@ public class ShopControllers : MonoBehaviour {
 	{
 		if (_counter == 0)
 		{
+			// Pick a random position on a circle surrounding the blink button
 			float random = Random.Range(0.0f, 360.0f);
 			transform.localPosition = new Vector3(0.38f + Distance * Mathf.Cos(Mathf.PI * random / 180.0f), 2.62f + Distance * Mathf.Sin(Mathf.PI * random / 180.0f), 0.0f);
 			_counter = WaitTime;
@@ -144,6 +159,7 @@ public class ShopControllers : MonoBehaviour {
 		{
 			_bullet.transform.localPosition = new Vector3(_bullet.transform.localPosition.x + 0.5f, _bullet.transform.localPosition.y, _bullet.transform.localPosition.z);
 		}
+		// Rotate the gun when it is fired to give the effect of recoil
 		if(_counter >= 50)
 		{
 			transform.localEulerAngles = new Vector3(0.0f, 0.0f, 60.0f - _counter);
@@ -166,7 +182,7 @@ public class ShopControllers : MonoBehaviour {
 		}
 	}
 
-	// The shield sprite animatioon. blinks for a few seconds whenver a bullet hits it
+	// The shield sprite animation. blinks for a few seconds whenver a bullet hits it
 	void Shield()
 	{
 		if (_counter % 20 < 10 && _counter != 0)
@@ -180,6 +196,44 @@ public class ShopControllers : MonoBehaviour {
 		if (_counter > 0)
 		{
 			_counter--;
+		}
+	}
+
+	// The heart sprite animation. Spins
+	void Heart()
+	{
+		if (_counter >= 30)
+		{
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, 12f * (60 - _counter));
+		}
+		if (_counter > 0)
+		{
+			_counter--;
+		}
+		if(_counter == 0)
+		{
+			_counter = 90;
+		}
+	}
+
+	// The heart sprite animation. Spins
+	void Tiny()
+	{
+		if (_counter > 90)
+		{
+			transform.localScale = new Vector3(transform.localScale.x - 0.02f, transform.localScale.y - 0.02f, 1.0f);
+		}
+		if (_counter > 30 && _counter <= 60)
+		{
+			transform.localScale = new Vector3(transform.localScale.x + 0.02f, transform.localScale.y + 0.02f, 1.0f);
+		}
+		if (_counter > 0)
+		{
+			_counter--;
+		}
+		if (_counter == 0)
+		{
+			_counter = 120;
 		}
 	}
 

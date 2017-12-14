@@ -14,11 +14,14 @@ public class NameDodgeball : MonoBehaviour {
 	// Move around the title
 	void FixedUpdate () {
 		transform.localPosition = new Vector3(0.0f, transform.localPosition.y +_movement, transform.localPosition.z);
+
+		// Move infront of the title bar
 		if(transform.localPosition.y < -6.0)
 		{
 			transform.localPosition = new Vector3(0.0f, transform.localPosition.y, 5.0f);
 			_movement = -_movement;
 		}
+		// Move behind the title bar
 		if (transform.localPosition.y > 6.0f)
 		{
 			transform.localPosition = new Vector3(0.0f, transform.localPosition.y, -5.0f);

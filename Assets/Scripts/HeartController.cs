@@ -15,9 +15,10 @@ public class HeartController : MonoBehaviour {
 	void Start () {
 	}
 	
-	// Update is called once per frame
+	// FixedUpdate is called once per frame
 	void FixedUpdate () {
-		//If the player Object associated with this health bar is destroyed destroy it as well
+		// If the player Object associated with this health bar is destroyed destroy it as well
+		// This is for when a player disconnects from a game
 		if(Player == null)
 		{
 			Destroy(gameObject);

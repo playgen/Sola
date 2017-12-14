@@ -13,12 +13,7 @@ public class ParticleController : MonoBehaviour {
 		_particles = GetComponentsInChildren<ParticleSystem>();
 	}
 
-	// Update is called once per frame
-	void FixedUpdate()
-	{
-
-	}
-
+	// Play particle effects
 	public void Play()
 	{
 		foreach (ParticleSystem p in _particles)
@@ -26,6 +21,8 @@ public class ParticleController : MonoBehaviour {
 			p.Play();
 		}
 	}
+
+	// Stop particle effects
 	public void Stop()
 	{
 		foreach (ParticleSystem p in _particles)

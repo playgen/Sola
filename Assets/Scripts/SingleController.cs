@@ -18,7 +18,7 @@ public class SingleController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		// Set _player equal to the player
+		// Set _player equal to the player object
 		_player = GameObject.FindGameObjectWithTag("Player");
 
 		// Only execute on single player games
@@ -28,7 +28,7 @@ public class SingleController : MonoBehaviour {
 			if (Input.GetKey(KeyCode.Tab) && GetComponent<Controller>().StartCounter == -1)
 			{
 				// Counter between initialization and the actual game starting
-				GetComponent<Controller>().StartCounter = 60;
+				GetComponent<Controller>().StartCounter = 61;
 				_player.GetComponent<PlayerController>().InGame = true;
 				// Tell the dodgeball generator that the game has started
 				GameObject.FindGameObjectWithTag("DBSGenerator").GetComponent<DBGenerator>().InGame = true;

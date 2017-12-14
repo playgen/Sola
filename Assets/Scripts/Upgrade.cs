@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Controller for the buttons within the store men
+// Controller for the buttons within the store menu
 public class Upgrade : MonoBehaviour {
 
 	public Sprite[] Sprites;
 	public GameObject[] Previous;
 
-	public bool Hover, Pressed, Bought, Selected;
+	public bool Hover, Pressed, Bought, IGS;
 	public float Value, SoloValue;
 	public string Key;
 	
@@ -26,29 +26,26 @@ public class Upgrade : MonoBehaviour {
 		}
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate ()
 	{
-		// Here the correct sprite is chosen for each button
-		// If an item has been purchased and is equipped
-		if (Selected)
+		if (!IGS)
 		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[3];
-		}
-		// If you are hovering over a button set the sprite
-		else if(Hover)
-		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[1];
-		}
-		// If you have bought the item (And not equipped if possible)
-		else if (Bought)
-		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[2];
-		}
-		// If none of the above use the default sprite
-		else
-		{
-			GetComponent<SpriteRenderer>().sprite = Sprites[0];
+			// Here the correct sprite is chosen for each button
+			// If you are hovering over a button set the sprite
+			if (Hover)
+			{
+				GetComponent<SpriteRenderer>().sprite = Sprites[1];
+			}
+			// If you have bought the item
+			else if (Bought)
+			{
+				GetComponent<SpriteRenderer>().sprite = Sprites[2];
+			}
+			// If none of the above use the default sprite
+			else
+			{
+				GetComponent<SpriteRenderer>().sprite = Sprites[0];
+			}
 		}
 
 		// Update the value of items with multiple levels

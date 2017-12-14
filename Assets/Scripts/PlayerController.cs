@@ -7,120 +7,169 @@ using UnityEngine.Networking;
 public class PlayerController : NetworkBehaviour
 {
 	public float Speed, Time;
-	public GameObject Hearts, Controller, Spin, Shield, Bomb, Bullet, ScoreDisplay;
+	public GameObject Hearts, ScoreDisplay, Marker;
+	public Sprite[] MarkerSprites;
 	public bool Server, Client, InGame, Damage;
-	public string Name;
-	public GameObject[] Stripes = new GameObject[2];
-	public Material[] Materials = new Material[5];
-	public int Invincibility, Health, State, CounterTime, Score;
+	public GameObject[] Stripes;
+	public Material[] Materials;
+	public int Invincibility, Health, State, Score, Mode, ID;
 
-	private int _abilityCounter, _spinCounter, _colour;
-	private float _x, _y, _z;
-	private bool _connected;
-	private Vector3 _initialPosition;
-	private Transform[] _ability;
+	AbilityController _abilities;
+	Controller _controller;
+	int _colour;
+	float _x, _y, _z;
+	bool _connected;
+	Vector3 _initialPosition;
 
 	// Use this for initialization
 	void Start()
 	{
-		//Set Initial values
-		Controller = GameObject.FindGameObjectWithTag("Controller");
+		_controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
+		_abilities = GetComponent<AbilityController>();
+		// Assign the players hearts/score to the rankings object so it stays in the top left of the screen
 		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
-		Speed += Controller.GetComponent<Controller>().Requested["speed"];
+		// You can buy speed boosts
+		Speed += _controller.Requested["speed"];
 
 		_initialPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-		_ability = Controller.GetComponent<Controller>().Ability.GetComponentsInChildren<Transform>();
-		_abilityCounter = 0;
-		_spinCounter = -1;
 		_connected = false;
-
 		Damage = false;
 		InGame = false;
 		Server = false;
 		Client = false;
 		Score = 0;
 		State = 0;
-		Name = "";
+		ID = -1;
+		Mode = 2;
 		Time = 99999;
 		
+		// Assign each player a colour
+		if (isServer)
+		{
+			_colour = GameObject.FindGameObjectsWithTag("Player").Length - 1;
+		}
+		SetColour();
 	}
 
 	// Update is called once per frame
 	void FixedUpdate()
 	{
+		// If the user is the server tell all other users what colour this player should be
+		if (isServer)
+		{
+			RpcColour(_colour);
+		}
+		if (Mode == 1)
+		{
+			ScoreDisplay.SetActive(true);
+			Marker.SetActive(false);
+		}
+		else
+		{
+			ScoreDisplay.SetActive(false);
+			Marker.SetActive(true);
+			Marker.GetComponent<SpriteRenderer>().sprite = MarkerSprites[_colour];
+		}
+		// Get the players score and health
 		Score = ScoreDisplay.GetComponent<PlaceController>().Score;
-		_colour = Hearts.GetComponent<HeartController>().Place;
 		Health = Hearts.GetComponent<HeartController>().Health;
+		// Players are continuously spinning
 		transform.localEulerAngles = new Vector3(0.0f, 0.0f, transform.localEulerAngles.z - 2.0f);
-		transform.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
 
-		SetColour();
+		// If a player recently took damage it becomes invincible for a while
 		Invinc();
+		// If the player has died or is not in the game hide them
 		OutOfTheWay();
 
-		if (!isLocalPlayer && !Controller.GetComponent<Controller>().SinglePlayer)
+		// If this is not the local player ignore the rest of the script
+		if (!isLocalPlayer && !_controller.SinglePlayer)
 		{
 			return;
 		}
+		// Is the player a server or client. If both then just server is true
 		Server = isServer;
-
-		if (isClient && !_connected)
-		{
-			CmdAdd();
-		}
-
-		_connected = isClient;
 		Client = isClient && !Server;
-		Controller.GetComponent<Controller>().Client = Client;
-
-		if (Input.GetKey(KeyCode.E) && _abilityCounter == 0 && Controller.GetComponent<Controller>().Requested["selected"] != 0 && Controller.GetComponent<Controller>().Started)
-		{
-			if(isClient)
-			{
-				CmdAbility(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.position);
-			}
-			else
-			{
-				Ability(Controller.GetComponent<Controller>().Requested["selected"], Camera.main.ScreenToWorldPoint(Input.mousePosition), transform.position);
-			}
-		}
-		if(_spinCounter == 0)
-		{
-			Spin.SetActive(false);
-			_abilityCounter = CounterTime;
-		}
-		if (_spinCounter >= 0)
-		{
-			_spinCounter--;
-		}
-		if (_abilityCounter > 0)
-		{
-			_abilityCounter--;
-			int abilityCalVal = (_abilityCounter / (CounterTime / 8));
-			if (abilityCalVal < 7)
-			{
-				_ability[abilityCalVal].GetComponent<SpriteRenderer>().enabled = false;
-			}
-		}
+		
+		// Move the player
 		Move();
 	}
-	
-	//Set Players Colour
+
+	//Send Players Name to the Server if it's the local player
+	public void SendName()
+	{
+		if (isLocalPlayer)
+		{
+			CmdName(_controller.PlayerID);
+		}
+	}
+
+	//If this player isn't in this game or has died move them off screen
+	void OutOfTheWay()
+	{
+		if (Health == 0 && State == 0)
+		{
+			transform.localPosition = new Vector3(400.0f, 0.0f, 0.0f);
+			State = 1;
+		}
+		if (_controller.Started == true && !InGame && State == 0)
+		{
+			transform.localPosition = new Vector3(300.0f, 0.0f, 0.0f);
+			Hearts.GetComponent<HeartController>().Health = 0;
+			State = 2;
+		}
+	}
+
+	//Move controller
+	void Move()
+	{
+		transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+		_x = transform.GetComponent<Rigidbody>().velocity.x;
+		_y = transform.GetComponent<Rigidbody>().velocity.y;
+		_z = transform.GetComponent<Rigidbody>().velocity.z;
+		if (_controller.Started && _controller.GameOverCounter == 0)
+		{
+			var x = Input.GetAxisRaw("Horizontal");
+			var y = Input.GetAxisRaw("Vertical");
+			_y = Speed * y / 10;
+			_x = Speed * x / 10;
+			// Pythagoras to make sure you constantly move at the right speed
+			if (_x != 0 && _y != 0)
+			{
+				_x = _x / Mathf.Abs(_x);
+				_y = _y / Mathf.Abs(_y);
+				_x = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _x;
+				_y = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _y;
+			}
+		}
+		transform.GetComponent<Rigidbody>().velocity = new Vector3(_x, _y, _z);
+
+		// Player can't move outside of the world
+		if (Health > 0 && InGame)
+		{
+			if (transform.localPosition.x >= 8.64)
+			{
+				transform.localPosition = new Vector3(8.64f, transform.localPosition.y, transform.localPosition.z);
+			}
+			else if (transform.localPosition.x <= -8.64)
+			{
+				transform.localPosition = new Vector3(-8.64f, transform.localPosition.y, transform.localPosition.z);
+			}
+			if (transform.localPosition.y >= 4.57)
+			{
+				transform.localPosition = new Vector3(transform.localPosition.x, 4.57f, transform.localPosition.z);
+			}
+			else if (transform.localPosition.y <= -4.57)
+			{
+				transform.localPosition = new Vector3(transform.localPosition.x, -4.57f, transform.localPosition.z);
+			}
+		}
+	}
+
+	//Set players colour and the colour of its score
 	public void SetColour()
 	{
 		GetComponent<Renderer>().material = Materials[_colour];
 		ScoreDisplay.GetComponent<PlaceController>().Offset = _colour * 10;
-	}
-
-	//Send Players Name to the Server
-	public void SendName()
-	{
-		if (!isLocalPlayer)
-		{
-			return;
-		}
-		CmdName(Controller.GetComponent<Controller>().PlayerName);
-		//Debug.Log(_controller.GetComponent<Controller>().PlayerName);
 	}
 
 	//Reset Player
@@ -135,6 +184,7 @@ public class PlayerController : NetworkBehaviour
 	//If invincible switch material
 	void Invinc()
 	{
+		// Flash different colours to indicate that it's invincible
 		if (Invincibility > 0)
 		{
 			if (Invincibility % 10 > 5)
@@ -153,95 +203,89 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	//Move controller
-	void Move()
-	{
-		transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-		_x = transform.GetComponent<Rigidbody>().velocity.x;
-		_y = transform.GetComponent<Rigidbody>().velocity.y;
-		_z = transform.GetComponent<Rigidbody>().velocity.z;
-		if (Controller.GetComponent<Controller>().Started && Controller.GetComponent<Controller>().GameOverCounter == 0)
-		{
-			var x = Input.GetAxisRaw("Horizontal");
-			var y = Input.GetAxisRaw("Vertical");
-			_y = Speed * y / 10;
-			_x = Speed * x / 10;
-			// Pythag to make sure you constantly move at the right speed
-			if (_x != 0 && _y != 0)
-			{
-				_x = _x / Mathf.Abs(_x);
-				_y = _y / Mathf.Abs(_y);
-				_x = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _x;
-				_y = (Speed / 10) * Mathf.Cos(45.0f * Mathf.PI / 180.0f) * _y;
-			}
-		}
-		transform.GetComponent<Rigidbody>().velocity = new Vector3(_x, _y, _z);
-	}
-
-	//If this player isn't in this turn move them off screen
-	void OutOfTheWay()
-	{
-		if (Health == 0 && State == 0)
-		{
-			transform.localPosition = new Vector3(400.0f, 0.0f, 0.0f);
-			State = 1;
-		}
-		if (Controller.GetComponent<Controller>().Started == true && !InGame && State == 0)
-		{
-			transform.localPosition = new Vector3(300.0f, 0.0f, 0.0f);
-			Hearts.GetComponent<HeartController>().Health = 0;
-			State = 2;
-		}
-	}
-
 	//When hit by a dodgeball/Ability turn Damage to true
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.tag == "DodgeBall")
+		// Hit by a dodgeball
+		if (other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
 		{
-			Damage = true;
-			if (Shield.activeSelf)
+			if (isClient)
 			{
-				Hearts.GetComponent<HeartController>().Health++;
-				Shield.SetActive(false);
+				// Tell the server
+				CmdCollision();
 			}
-		}
-		if(other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
-		{
-			Damage = true;
-		}
-		if (other.tag == "Explosion")
-		{
-			Damage = true;
-		}
-		if (other.tag == "Bullet")
-		{
-			if (other.GetComponent<BulletController>().From != transform)
+			else
 			{
+				// If you have a shield negate the damage and deactivate the shield
 				Damage = true;
+				if (_abilities.Shield.activeSelf)
+				{
+					Hearts.GetComponent<HeartController>().Health++;
+					_abilities.Shield.SetActive(false);
+				}
 			}
 		}
-	}
-	//When hit by a dodgeball turn Damage to true
-	void OnTriggerStay(Collider other)
-	{
-		if (other.tag == "DodgeBall")
-		{
-			Damage = true;
-			if (Shield.activeSelf)
-			{
-				Hearts.GetComponent<HeartController>().Health++;
-				Shield.SetActive(false);
-			}
-		}
+		// Hit by a blade
 		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
 		{
 			Damage = true;
 		}
+		// Hit by a bomb
 		if (other.tag == "Explosion")
 		{
 			Damage = true;
 		}
+		// Hit by a bullet
+		if (other.tag == "Bullet")
+		{
+			if (other.GetComponent<BulletController>().From != transform)
+			{
+				Damage = true;
+			}
+		}
+		// Hit by a heart
+		if (other.tag == "Health" && Health < 5)
+		{
+			if(other.GetComponent<BonusHealth>().Player != gameObject)
+			{
+				CmdHeart(other.GetComponent<BonusHealth>().Player);
+			}
+		}
+	}
+
+	// Handles being hit by a dodgeball or an ability
+	void OnTriggerStay(Collider other)
+	{
+		// Hit by a dodgeball
+		if (other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
+		{
+			if (isClient)
+			{
+				// Tell the server
+				CmdCollision();
+			}
+			else
+			{
+				// If you have a shield negate the damage and deactivate the shield
+				Damage = true;
+				if (_abilities.Shield.activeSelf)
+				{
+					Hearts.GetComponent<HeartController>().Health++;
+					_abilities.Shield.SetActive(false);
+				}
+			}
+		}
+		// Hit by a blade
+		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
+		{
+			Damage = true;
+		}
+		// Hit by a bomb
+		if (other.tag == "Explosion")
+		{
+			Damage = true;
+		}
+		// Hit by a bullet
 		if (other.tag == "Bullet")
 		{
 			if (other.GetComponent<BulletController>().From != transform)
@@ -251,180 +295,138 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
-	[Command]
-	public void CmdAdd()
+	//Update scores
+	[ClientRpc]
+	public void RpcScores(int score)
 	{
-		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().Players++;
+		//Co-op
+		if(Mode == 2)
+		{
+			// Add to the shared score
+			_controller.SharedScore.GetComponent<PlaceController>().Score += score;
+		}
+		// Versus
+		else
+		{
+			// Add to personal score
+			ScoreDisplay.GetComponent<PlaceController>().Score += score;
+		}
 	}
 
-	[Command]
-	void CmdName(string playerName)
+	//Set colour
+	[ClientRpc]
+	public void RpcColour(int number)
 	{
-		Name = playerName;
+		_colour = number;
+		SetColour();
 	}
 
+	// The command which matches the players name on the server to the clients name
 	[Command]
-	void CmdAbility(float selected, Vector3 mouse, Vector3 regular)
+	void CmdName(int playerName)
 	{
-		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().RpcAbility(gameObject, selected, mouse, regular);
+		ID = playerName;
 	}
 
 
-	public void Ability(float selected, Vector3 mouse, Vector3 regular)
+	// Lets the request button to talk the server. If the user is the server enables the request arrows
+	// on the clients
+	public void Request()
 	{
-		if (selected == 1)
+		if(!isServer)
 		{
-			Explode(mouse, regular);
+			CmdRequest();
 		}
-		if (selected == 2)
+		else
 		{
-			Blink();
+			RpcArrows(_colour);
 		}
-		if (selected == 3)
+	}
+
+	// The command which matches the players name on the server to the clients name
+	[Command]
+	void CmdRequest()
+	{
+		RpcArrows(_colour);
+	}
+
+
+
+	// Sets request arrows on on the clients meaning people can send money to another user
+	[ClientRpc]
+	public void RpcArrows(int number)
+	{
+		if(!isLocalPlayer)
 		{
-			Turret();
+			_controller.CoinArrows[number].SetActive(true);
+			_controller.CoinArrows[number].GetComponent<Request>().Player = GetComponent<PlayerController>();
 		}
-		if (selected == 4)
+	}
+
+
+
+	// Lets the MoneyChange class talk to the server
+	public void GaveMoney()
+	{
+		if (!isServer)
 		{
-			Block();
+			CmdGave();
 		}
-		if (selected == 5)
+		else
 		{
-			Spinners();
+			RpcGave();
 		}
-		if(isLocalPlayer || Controller.GetComponent<Controller>().SinglePlayer)
+	}
+
+	// Tell the server you just gave a user coins
+	[Command]
+	void CmdGave()
+	{
+		RpcGave();
+	}
+
+	// Tell the server the player just hit a ball
+	[Command]
+	void CmdCollision()
+	{
+		// If you have a shield negate the damage and deactivate the shield
+		Damage = true;
+		if (_abilities.Shield.activeSelf)
 		{
-			foreach (Transform t in _ability)
+			Hearts.GetComponent<HeartController>().Health++;
+			_abilities.Shield.SetActive(false);
+		}
+	}
+
+	// Tell the server the player just hit a heart
+	[Command]
+	void CmdHeart(GameObject player)
+	{
+		RpcHeart(player);
+	}
+	
+	// Tell the correct user they have just been given 1000 coins
+	[ClientRpc]
+	public void RpcHeart(GameObject player)
+	{
+		GameObject[] hearts = GameObject.FindGameObjectsWithTag("Health");
+		foreach (GameObject h in hearts)
+		{
+			if(h.GetComponent<BonusHealth>().Player == player)
 			{
-				t.GetComponent<SpriteRenderer>().enabled = true;
+				Destroy(h);
+				Hearts.GetComponent<HeartController>().Health++;
 			}
 		}
 	}
 
-
-	//Blink ability
-	void Blink()
+	// Tell the correct user they have just been given 1000 coins
+	[ClientRpc]
+	public void RpcGave()
 	{
-		_abilityCounter = CounterTime;
-		Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		float angle;
-		if (mouse.x - transform.position.x >= 0.0f)
+		if (isLocalPlayer)
 		{
-			angle = 90 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
-		}
-		else
-		{
-			angle = 270 - Mathf.Atan((mouse.y - transform.position.y) / (mouse.x - transform.position.x)) * 180.0f / Mathf.PI;
-		}
-		angle = angle % 90;
-		float x = Mathf.Sin(angle / 180.0f * Mathf.PI) * 2.0f;
-		float y = Mathf.Cos(angle / 180.0f * Mathf.PI) * 2.0f;
-		if (mouse.x - transform.position.x >= 0.0f && mouse.y - transform.position.y >= 0.0f)
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x + x, transform.localPosition.y + y, transform.localPosition.z);
-		}
-		else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y < 0.0f)
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x - x, transform.localPosition.y - y, transform.localPosition.z);
-		}
-		else if (mouse.x - transform.position.x < 0.0f && mouse.y - transform.position.y >= 0.0f)
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x - y, transform.localPosition.y + x, transform.localPosition.z);
-		}
-		else
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x + y, transform.localPosition.y - x, transform.localPosition.z);
-		}
-		if (transform.localPosition.x >= 8.64)
-		{
-			transform.localPosition = new Vector3(8.64f, transform.localPosition.y, transform.localPosition.z);
-		}
-		else if (transform.localPosition.x <= -8.64)
-		{
-			transform.localPosition = new Vector3(-8.64f, transform.localPosition.y, transform.localPosition.z);
-		}
-		if (transform.localPosition.y >= 4.57)
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x, 4.57f, transform.localPosition.z);
-		}
-		else if (transform.localPosition.y <= -4.57)
-		{
-			transform.localPosition = new Vector3(transform.localPosition.x, -4.57f, transform.localPosition.z);
-		}
-	}
-
-	//Blades ability
-	void Spinners()
-	{
-		Spin.SetActive(true);
-		_spinCounter = CounterTime / 4;
-		_abilityCounter = -1;
-	}
-
-	//Shield ability
-	void Block()
-	{
-		Shield.SetActive(true);
-		_abilityCounter = CounterTime;
-	}
-
-	//Explode ability
-	void Explode(Vector3 mouse, Vector3 regular)
-	{
-		GameObject bomb = Instantiate(Bomb);
-		bomb.transform.position = transform.position;
-		_abilityCounter = CounterTime;
-
-		float angle;
-		if (mouse.x - regular.x >= 0.0f)
-		{
-			angle = 90 - Mathf.Atan((mouse.y - regular.y) / (mouse.x - regular.x)) * 180.0f / Mathf.PI;
-		}
-		else
-		{
-			angle = 270 - Mathf.Atan((mouse.y - regular.y) / (mouse.x - regular.x)) * 180.0f / Mathf.PI;
-		}
-		angle = angle % 90;
-		float x = Mathf.Sin(angle / 180.0f * Mathf.PI) * 2.0f;
-		float y = Mathf.Cos(angle / 180.0f * Mathf.PI) * 2.0f;
-		if (mouse.x - regular.x >= 0.0f && mouse.y - regular.y >= 0.0f)
-		{
-			bomb.GetComponent<Rigidbody>().velocity = new Vector3(x, y, 0);
-		}
-		else if (mouse.x - regular.x < 0.0f && mouse.y - regular.y < 0.0f)
-		{
-			bomb.GetComponent<Rigidbody>().velocity = new Vector3(-x, -y, 0);
-		}
-		else if (mouse.x - regular.x < 0.0f && mouse.y - regular.y >= 0.0f)
-		{
-			bomb.GetComponent<Rigidbody>().velocity = new Vector3(-y, x, 0);
-		}
-		else
-		{
-			bomb.GetComponent<Rigidbody>().velocity = new Vector3(y, -x, 0);
-		}
-	}
-
-	//When you press B spin
-	void Turret()
-	{
-		float turn = 0.0f;
-		for(int i = 0; i < 6; i++)
-		{
-			GameObject bullet = Instantiate(Bullet);
-			bullet.transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-			bullet.transform.localEulerAngles = new Vector3(0.0f, 0.0f, turn);
-			bullet.GetComponentInChildren<BulletController>().From = transform;
-			turn += 60.0f;
-		}
-		_abilityCounter = CounterTime;
-	}
-
-	void setTime(float time)
-	{
-		if (Time > time)
-		{
-			time = Time;
+			_controller.Gain.GetComponent<MoneyChange>().Change(false);
 		}
 	}
 }

@@ -23,6 +23,9 @@ TagManager:
   - Star
   - Explosion
   - Bullet
+  - Zone
+  - Mode
+  - Health
   layers:
   - Default
   - TransparentFX

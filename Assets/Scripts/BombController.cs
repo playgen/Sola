@@ -25,7 +25,7 @@ public class BombController : MonoBehaviour {
 		}
 		else if (Counter == 0)
 		{
-			// After the first counter explode and stop moving
+			// After the first counter ends, explode, change to the explosion sprite and stop moving
 			Explosion.SetActive(true);
 			GetComponent<SpriteRenderer>().enabled = false;
 			GetComponent<Rigidbody>().velocity = Vector3.zero;

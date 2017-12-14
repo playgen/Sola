@@ -3,16 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Handles button interactions within the shop
 public class UpgradeController : MonoBehaviour {
 	
 	public GameObject[] Numbers;
 	public GameObject[] Positions;
 	public Sprite[] ChestSprite, NumberSprite;
 	public GameObject Chest, Controller, Store, Single, Online, Back;
+	public bool InGameStore;
 
 	GameObject[] _values;
 	Upgrade[] _buttons;
-	float _wealth, _minus;
+	float _wealth, _minus, _oldWealth, _oldMinus;
 	bool _hovered, _done;
 	string _wealthString, _minusString;
 	int _justHovered, _newValue, _individual;
@@ -20,38 +22,36 @@ public class UpgradeController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+		// Get all the buttons in the shop
 		_buttons = GetComponentsInChildren<Upgrade>();
 		_values = new GameObject[Positions.Length];
+		_oldWealth = 0;
 		_wealth = 0;
 		_justHovered = 0;
 		_minus = 0.0f;
-		_wealthString = _wealth.ToString();
-		while (_wealthString.Length < 7)
-		{
-			_wealthString = "0" + _wealthString;
-		}
-		//It will cut off at 7 digits
+
+		// Initially set players wealth and item price to 0. In case the actual values weren't pulled correctly
 		for (int i = 0; i < Positions.Length; i++)
 		{
 			_values[i] = GameObject.Instantiate(Numbers[0]);
 			_values[i].transform.position = Positions[i].transform.position;
 			_values[i].transform.parent = transform;
+			if (InGameStore)
+			{
+				_values[i].transform.localScale = new Vector3(0.2f, 0.2f, _values[i].transform.localScale.z);
+			}
 		}
 	}
-	
-	// Update is called once per frame
+
 	void FixedUpdate ()
 	{
 		CalculateDifferences();
 		Dictionary();
-		int quantity = (int)Controller.GetComponent<Controller>().Requested["selected"];
-		foreach (Upgrade up in _buttons)
+		if(!InGameStore)
 		{
-			Clicked(up);
-			up.Selected = false;
-			if ((up.Key == "bomb" && quantity == 1) || (up.Key == "blink" && quantity == 2) || (up.Key == "gun" && quantity == 3) || (up.Key == "shield" && quantity == 4) || (up.Key == "razor" && quantity == 5))
+			foreach (Upgrade up in _buttons)
 			{
-				up.Selected = true;
+				Clicked(up);
 			}
 		}
 	}
@@ -107,39 +107,6 @@ public class UpgradeController : MonoBehaviour {
 				up.Bought = true;
 			}
 		}
-		if(up.Bought == true && up.Pressed == true)
-		{
-			if (up.Key == "bomb")
-			{
-				Controller.GetComponent<Controller>().SetResource("selected", 1);
-				Controller.GetComponent<Controller>().Requested.Remove("selected");
-				Controller.GetComponent<Controller>().Requested.Add("selected", 1);
-			}
-			else if (up.Key == "blink")
-			{
-				Controller.GetComponent<Controller>().SetResource("selected", 2);
-				Controller.GetComponent<Controller>().Requested.Remove("selected");
-				Controller.GetComponent<Controller>().Requested.Add("selected", 2);
-			}
-			else if (up.Key == "gun")
-			{
-				Controller.GetComponent<Controller>().SetResource("selected", 3);
-				Controller.GetComponent<Controller>().Requested.Remove("selected");
-				Controller.GetComponent<Controller>().Requested.Add("selected", 3);
-			}
-			else if (up.Key == "shield")
-			{
-				Controller.GetComponent<Controller>().SetResource("selected", 4);
-				Controller.GetComponent<Controller>().Requested.Remove("selected");
-				Controller.GetComponent<Controller>().Requested.Add("selected", 4);
-			}
-			else if (up.Key == "razor")
-			{
-				Controller.GetComponent<Controller>().SetResource("selected", 5);
-				Controller.GetComponent<Controller>().Requested.Remove("selected");
-				Controller.GetComponent<Controller>().Requested.Add("selected", 5);
-			}
-		}
 		if (up.Pressed == true)
 		{
 			up.Pressed = false;
@@ -148,13 +115,17 @@ public class UpgradeController : MonoBehaviour {
 
 	void CalculateDifferences()
 	{
-		if (_hovered)
+		if(!InGameStore)
 		{
-			Chest.GetComponent<SpriteRenderer>().sprite = ChestSprite[1];
-		}
-		else
-		{
-			Chest.GetComponent<SpriteRenderer>().sprite = ChestSprite[0];
+			if (_hovered)
+			{
+				Chest.GetComponent<SpriteRenderer>().sprite = ChestSprite[1];
+			}
+			else
+			{
+				Chest.GetComponent<SpriteRenderer>().sprite = ChestSprite[0];
+			}
+
 		}
 		_wealthString = (_wealth - _minus).ToString();
 		while (_wealthString.Length < 7)
@@ -189,14 +160,18 @@ public class UpgradeController : MonoBehaviour {
 			}
 		}
 
+		int send = 0;
+		if ((_wealth - _minus) != _oldWealth || _minus != _oldMinus)
+		{
+			send = 1;
+		}
+
 		_minusString = _minus.ToString();
 		while (_minusString.Length < 7)
 		{
 			_minusString = "0" + _minusString;
 		}
-
-		int send = _justHovered % 2;
-		// 1 means just covered, 2 means covering, 3 means just stopped covering & 0 means not covering
+			// 1 means just covered, 2 means covering, 3 means just stopped covering & 0 means not covering
 		if (_justHovered == 1 && Mathf.Abs(_values[7].transform.localEulerAngles.x) < 0.04)
 		{
 			_justHovered = 2;
@@ -205,7 +180,6 @@ public class UpgradeController : MonoBehaviour {
 		{
 			_justHovered = 0;
 		}
-
 		// 7 Digits for your wealth and 7 for the price
 		FlipNumbers(0, 7, _wealthString, send);
 		FlipNumbers(7, Positions.Length, _minusString, send);
@@ -214,6 +188,7 @@ public class UpgradeController : MonoBehaviour {
 
 	void FlipNumbers(int start, int end, string comparison, int pass)
 	{
+		
 		//It will cut off at 7 digits. Make it so that it either has a coin cap or makes it clear
 		for (int i = start; i < end; i++)
 		{
@@ -232,27 +207,45 @@ public class UpgradeController : MonoBehaviour {
 			}
 			if (_values[i].transform.localEulerAngles.x >= 90.0f && _values[i].transform.localEulerAngles.x <= 120.0f)
 			{
+				if (start == 0)
+				{
+					_oldWealth = Int32.Parse(comparison);
+				}
+				if (start == 7)
+				{
+					_oldMinus = Int32.Parse(comparison);
+				}
 				Destroy(_values[i]);
 				_values[i] = GameObject.Instantiate(Numbers[_individual]);
 				_values[i].transform.position = Positions[i].transform.position;
 				_values[i].transform.localEulerAngles = new Vector3(-90.0f, 0.0f, 0.0f);
 				_values[i].transform.parent = transform;
-				_values[i].transform.localScale = new Vector3(0.5f, 0.5f, _values[i].transform.localScale.z);
+				if (InGameStore)
+				{
+					_values[i].transform.localScale = new Vector3(0.2f, 0.2f, _values[i].transform.localScale.z);
+				}
+				else
+				{
+					_values[i].transform.localScale = new Vector3(0.5f, 0.5f, _values[i].transform.localScale.z);
+				}
 
 				if (_minus != 0)
 				{
 					for (int j = 0; j < 8; j++)
 					{
-						SpriteRenderer[] sprites = _values[i].transform.GetComponentsInChildren<SpriteRenderer>();
-						foreach (SpriteRenderer s in sprites)
+						if (!InGameStore)
 						{
-							if (Int32.Parse(_wealthString) > 0)
+							SpriteRenderer[] sprites = _values[i].transform.GetComponentsInChildren<SpriteRenderer>();
+							foreach (SpriteRenderer s in sprites)
 							{
-								s.sprite = NumberSprite[1];
-							}
-							else
-							{
-								s.sprite = NumberSprite[2];
+								if (Int32.Parse(_wealthString) > 0)
+								{
+									s.sprite = NumberSprite[1];
+								}
+								else
+								{
+									s.sprite = NumberSprite[2];
+								}
 							}
 						}
 					}
