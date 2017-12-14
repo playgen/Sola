@@ -172,7 +172,7 @@ public class AbilityController : NetworkBehaviour
 		_abilityCounter = CounterTime;
 	}
 
-	//Explode ability
+	//Bomb ability
 	void Explode(Vector3 mouse, Vector3 regular)
 	{
 		// Make a bomb and fire it in the direction of the mouse
@@ -210,7 +210,7 @@ public class AbilityController : NetworkBehaviour
 		}
 	}
 
-	//When you press B spin
+	// Fire bullets into the surrounding area
 	void Turret()
 	{
 		// Fire 6 bullets at 60 degree angles
@@ -226,7 +226,7 @@ public class AbilityController : NetworkBehaviour
 		_abilityCounter = CounterTime;
 	}
 
-	//When you press B spin
+	// Shrink the player and gain a speed boost
 	void Tiny()
 	{
 		GetComponent<PlayerController>().Speed = GetComponent<PlayerController>().Speed * 1.4f;
@@ -235,10 +235,10 @@ public class AbilityController : NetworkBehaviour
 		_abilityCounter = CounterTime;
 	}
 
-	//When you press B spin
+	// Throw out a heart that can be picked up by the other users
 	void Heart(Vector3 mouse, Vector3 regular)
 	{
-		// Make a bomb and fire it in the direction of the mouse
+		// Make a heart and fire it in the direction of the mouse
 		GameObject heart = Instantiate(Health);
 		heart.GetComponent<BonusHealth>().Player = gameObject;
 		heart.transform.position = transform.position;

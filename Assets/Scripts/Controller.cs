@@ -50,6 +50,7 @@ public class Controller : NetworkBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
+		// Once you have selected an item hide the store menu
 		if (Selected != -1)
 		{
 			IGS.SetActive(false);
@@ -132,7 +133,21 @@ public class Controller : NetworkBehaviour
 		// If you are the server, a client or are in a single player game and the game has not yet started
 		if ((_networkController.Server || _networkController.Client || SinglePlayer) && StartCounter == -1)
 		{
-			if(!_storeLoaded)
+			// If you joined let open the store
+			if (Selected == -1 && !IGS.activeSelf)
+			{
+				GameObject[] modes = GameObject.FindGameObjectsWithTag("Mode");
+				foreach (GameObject m in modes)
+				{
+					if (m.GetComponent<ButtonController>().On)
+					{
+						IGS.SetActive(true);
+						_storeLoaded = false;
+					}
+				}
+			}
+			// Initialise the store to match the game mode
+			if (!_storeLoaded)
 			{
 				_storeLoaded = true;
 				if (SinglePlayer)
@@ -255,6 +270,7 @@ public class Controller : NetworkBehaviour
 			ButtonController two = _gameMode[1].GetComponent<ButtonController>();
 			if (_networkController.Server)
 			{
+				// When you choose a game mode lock it in and display the store for everyone
 				if (one.Pressed)
 				{
 					_networkController.RpcStore();
@@ -272,6 +288,7 @@ public class Controller : NetworkBehaviour
 					two.On = true;
 				}
 			}
+			// Select the game mode depending on what was chosen
 			if(one.On)
 			{
 				_mode = 1;
@@ -281,6 +298,7 @@ public class Controller : NetworkBehaviour
 				_mode = 2;
 			}
 		}
+		// Single player
 		else
 		{
 			_mode = 2;
@@ -394,7 +412,6 @@ public class Controller : NetworkBehaviour
 		_gameMode[1].GetComponent<ButtonController>().On = false;
 		_storeLoaded = false;
 		// Show lobby sprites and reset variables
-		IGS.SetActive(true);
 		if (!SinglePlayer)
 		{
 			Request.SetActive(true);
@@ -478,6 +495,12 @@ public class Controller : NetworkBehaviour
 		foreach (Transform t in Ability.GetComponentsInChildren<Transform>())
 		{
 			t.GetComponent<SpriteRenderer>().enabled = false;
+		}
+		// destroy the mode selectors. They will automatically delete themselves anyway but there is a delay
+		GameObject[] modes = GameObject.FindGameObjectsWithTag("Mode");
+		foreach (GameObject m in modes)
+		{
+			Destroy(m);
 		}
 		// Reset the dodgeball generators
 		foreach (GameObject DBG in DBGS)

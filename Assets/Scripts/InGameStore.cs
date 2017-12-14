@@ -2,87 +2,73 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Controller for the in game store
 public class InGameStore : MonoBehaviour {
 
 	public Sprite[] Sprites;
 	public GameObject[] Items;
+	public int[] _option;
 
 	Controller _controller;
-	int _optionOne, _optionTwo;
 
 	// Use this for initialization
 	void Start () {
 		_controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate () {
-		if (Items[0].GetComponent<Upgrade>().Pressed)
+		for (int i = 0; i < Items.Length; i++)
 		{
-			if (_controller.Requested["coins"] >= 3000)
+			Upgrade upgrade = Items[i].GetComponent<Upgrade>();
+			// If an item in the store is selected and the user has enough money buy it
+			if (upgrade.Pressed && _controller.Requested["coins"] >= upgrade.SoloValue)
 			{
-				Items[0].GetComponent<Upgrade>().Pressed = false;
+
+				upgrade.Pressed = false;
+				_controller.Selected = _option[i];
+
+				// Update the players wealth
 				_controller.Requested.Remove("coins");
 				_controller.AddResource("coins", -3000);
 				_controller.GetResource("coins");
-				_controller.Selected = _optionOne;
-			}
-		}
-		if (Items[1].GetComponent<Upgrade>().Pressed)
-		{
-			Items[1].GetComponent<Upgrade>().Pressed = false;
-			if (_controller.Requested["coins"] >= 3000)
-			{
-				_controller.Requested.Remove("coins");
-				_controller.AddResource("coins", -3000);
-				_controller.GetResource("coins");
-				_controller.Selected = _optionTwo;
 			}
 		}
 	}
 
+	// Random choice of items in the in game store so every game is different
 	public void Change(int i)
 	{
+		int range = 0;
+		// Single player has 3 items (Shield, Blink, Tiny)
 		if (i == 0)
 		{
-			_optionOne = Random.Range(0, 3);
-			_optionTwo = Random.Range(0, 3);
-			while (_optionOne == _optionTwo)
-			{
-				_optionTwo = Random.Range(0, 3);
-			}
+			range = 3;
 		}
+		// Co-op has 4 items (Shield, Blink, Tiny, Health)
 		else if (i == 1)
 		{
-			_optionOne = Random.Range(0, 4);
-			_optionTwo = Random.Range(0, 4);
-			while (_optionOne == _optionTwo)
-			{
-				_optionTwo = Random.Range(0, 4);
-			}
+			range = 4;
 		}
+		// Versus has 6 items (Shield, Blink, Tiny, Spinners, Gun, Bomb)
 		else
 		{
-			_optionOne = Random.Range(0, 6);
-			if (_optionOne > 2)
-			{
-				_optionOne++;
-			}
-			_optionTwo = Random.Range(0, 6);
-			if (_optionTwo > 2)
-			{
-				_optionTwo++;
-			}
-			while (_optionOne == _optionTwo)
-			{
-				_optionTwo = Random.Range(0, 6);
-				if (_optionTwo > 2)
-				{
-					_optionTwo++;
-				}
-			}
+			range = 6;
 		}
-		Items[0].GetComponent<SpriteRenderer>().sprite = Sprites[_optionOne];
-		Items[1].GetComponent<SpriteRenderer>().sprite = Sprites[_optionTwo];
+		// Pick a random option
+		_option[0] = Random.Range(0, range);
+		_option[1] = Random.Range(0, range);
+		// The 2 options should be different
+		while (_option[0] == _option[1])
+		{
+			_option[1] = Random.Range(0, range);
+		}
+		// In versus skip the Health item
+		if (_option[1] > 2 && i == 2)
+		{
+			_option[1]++;
+		}
+		// Set the items to the correct sprites
+		Items[0].GetComponent<SpriteRenderer>().sprite = Sprites[_option[0]];
+		Items[1].GetComponent<SpriteRenderer>().sprite = Sprites[_option[1]];
 	}
 }

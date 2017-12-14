@@ -28,6 +28,7 @@ public class Upgrade : MonoBehaviour {
 	
 	void FixedUpdate ()
 	{
+		// Don't want to do this with the in game shop
 		if (!IGS)
 		{
 			// Here the correct sprite is chosen for each button

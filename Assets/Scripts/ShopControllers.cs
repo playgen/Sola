@@ -5,7 +5,7 @@ using UnityEngine;
 //Controller for the sprite animations in the shop screen
 public class ShopControllers : MonoBehaviour {
 
-	//Everyone
+	//All items
 	public int ItemNumber, WaitTime;
 	
 	int _counter;

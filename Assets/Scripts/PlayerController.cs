@@ -206,44 +206,9 @@ public class PlayerController : NetworkBehaviour
 	//When hit by a dodgeball/Ability turn Damage to true
 	void OnTriggerEnter(Collider other)
 	{
-		// Hit by a dodgeball
-		if (other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
-		{
-			if (isClient)
-			{
-				// Tell the server
-				CmdCollision();
-			}
-			else
-			{
-				// If you have a shield negate the damage and deactivate the shield
-				Damage = true;
-				if (_abilities.Shield.activeSelf)
-				{
-					Hearts.GetComponent<HeartController>().Health++;
-					_abilities.Shield.SetActive(false);
-				}
-			}
-		}
-		// Hit by a blade
-		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
-		{
-			Damage = true;
-		}
-		// Hit by a bomb
-		if (other.tag == "Explosion")
-		{
-			Damage = true;
-		}
-		// Hit by a bullet
-		if (other.tag == "Bullet")
-		{
-			if (other.GetComponent<BulletController>().From != transform)
-			{
-				Damage = true;
-			}
-		}
-		// Hit by a heart
+		// Handles colliding with a damage dealing object
+		CollisionHandler(other.transform);
+		// Collected a heart pick up
 		if (other.tag == "Health" && Health < 5)
 		{
 			if(other.GetComponent<BonusHealth>().Player != gameObject)
@@ -256,10 +221,36 @@ public class PlayerController : NetworkBehaviour
 	// Handles being hit by a dodgeball or an ability
 	void OnTriggerStay(Collider other)
 	{
-		// Hit by a dodgeball
-		if (other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
+		// Handles colliding with a damage dealing object
+		CollisionHandler(other.transform);
+	}
+
+	void CollisionHandler (Transform other)
+	{
+		bool hit = false;
+		if(other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
 		{
-			if (isClient)
+			hit = true;
+		}
+		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
+		{
+			hit = true;
+		}
+		if (other.tag == "Explosion")
+		{
+			hit = true;
+		}
+		if (other.tag == "Bullet")
+		{
+			if (other.GetComponent<BulletController>().From != transform)
+			{
+				hit = true;
+			}
+		}
+		// Hit by a dodgeball
+		if (hit)
+		{
+			if (isClient && isLocalPlayer)
 			{
 				// Tell the server
 				CmdCollision();
@@ -273,24 +264,6 @@ public class PlayerController : NetworkBehaviour
 					Hearts.GetComponent<HeartController>().Health++;
 					_abilities.Shield.SetActive(false);
 				}
-			}
-		}
-		// Hit by a blade
-		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
-		{
-			Damage = true;
-		}
-		// Hit by a bomb
-		if (other.tag == "Explosion")
-		{
-			Damage = true;
-		}
-		// Hit by a bullet
-		if (other.tag == "Bullet")
-		{
-			if (other.GetComponent<BulletController>().From != transform)
-			{
-				Damage = true;
 			}
 		}
 	}
@@ -350,8 +323,6 @@ public class PlayerController : NetworkBehaviour
 		RpcArrows(_colour);
 	}
 
-
-
 	// Sets request arrows on on the clients meaning people can send money to another user
 	[ClientRpc]
 	public void RpcArrows(int number)
@@ -362,8 +333,6 @@ public class PlayerController : NetworkBehaviour
 			_controller.CoinArrows[number].GetComponent<Request>().Player = GetComponent<PlayerController>();
 		}
 	}
-
-
 
 	// Lets the MoneyChange class talk to the server
 	public void GaveMoney()
@@ -394,7 +363,7 @@ public class PlayerController : NetworkBehaviour
 		if (_abilities.Shield.activeSelf)
 		{
 			Hearts.GetComponent<HeartController>().Health++;
-			_abilities.Shield.SetActive(false);
+			RpcShield();
 		}
 	}
 
@@ -405,10 +374,11 @@ public class PlayerController : NetworkBehaviour
 		RpcHeart(player);
 	}
 	
-	// Tell the correct user they have just been given 1000 coins
+	// Informs all players a user just gained a heart and destorys the heart pickup
 	[ClientRpc]
 	public void RpcHeart(GameObject player)
 	{
+		// Can't directly call heart object as they are individually spawned on each client
 		GameObject[] hearts = GameObject.FindGameObjectsWithTag("Health");
 		foreach (GameObject h in hearts)
 		{
@@ -426,7 +396,17 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isLocalPlayer)
 		{
+
+			_controller.Requested.Remove("coins");
+			_controller.GetResource("coins");
 			_controller.Gain.GetComponent<MoneyChange>().Change(false);
 		}
+	}
+
+	// Cancel shield on all clients
+	[ClientRpc]
+	public void RpcShield()
+	{
+		_abilities.Shield.SetActive(false);
 	}
 }

@@ -37,7 +37,11 @@ public class Request : MonoBehaviour {
 	void OnMouseDown()
 	{
 		_controller.TransferResource(Player.ID, "coins", 1000);
+		// Update dictionary with new wealth
+		_controller.Requested.Remove("coins");
+		_controller.GetResource("coins");
 		_controller.Gain.GetComponent<MoneyChange>().Change(true);
+		// Inform the other player they just got more money
 		Player.GaveMoney();
 	}
 }
