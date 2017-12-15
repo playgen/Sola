@@ -7,7 +7,7 @@ using UnityEngine;
 public class ShieldController : MonoBehaviour {
 
 	public GameObject Player;
-	public int Counter;
+	public int Counter, Upgraded;
 
 	int _count;
 	// Use this for initialization
@@ -17,7 +17,11 @@ public class ShieldController : MonoBehaviour {
 	
 	// Stay active until the counter runs out
 	void FixedUpdate () {
-		if (_count == 0)
+		if(Upgraded > 0)
+		{
+			Upgraded--;
+		}
+		else if (_count == 0)
 		{
 			_count = Counter;
 			gameObject.SetActive(false);

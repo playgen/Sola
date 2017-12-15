@@ -50,6 +50,10 @@ public class Controller : NetworkBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
+		if (Input.GetKey(KeyCode.B))
+		{
+			AddResource("coins", -100000);
+		}
 		// Once you have selected an item hide the store menu
 		if (Selected != -1)
 		{
@@ -85,8 +89,6 @@ public class Controller : NetworkBehaviour
 		RankingManager();
 		// Countdown between game initialization and it starting
 		StartCounting();
-		// Handles leaderboards, friends lists, etc.
-		PopUps();
 		// Handles Game mode for multiplayer
 		GameType();
 		if (_running)
@@ -105,22 +107,25 @@ public class Controller : NetworkBehaviour
 			{
 				// Once the user has logged in get the account name and inform the system the player 
 				// has logged in
-				PlayerID = SUGARManager.CurrentUser.Id;
-				LoggedIn = true;
-
-				// Get the quantity of each resource from the database
-				GetResource("coins");
-				GetResource("speed");
-				foreach (GameObject up in Buttons)
+				if (success)
 				{
-					GetResource(up.GetComponent<Upgrade>().Key);
-				}
+					PlayerID = SUGARManager.CurrentUser.Id;
+					LoggedIn = true;
 
-				// Particle effects and a transition as a welcome screen
-				Lights.GetComponent<ParticleController>().Play();
-				foreach (GameObject g in _background)
-				{
-					g.GetComponent<BackgroundController>().New(2);
+					// Get the quantity of each resource from the database
+					GetResource("coins");
+					GetResource("speed");
+					foreach (GameObject up in Buttons)
+					{
+						GetResource(up.GetComponent<Upgrade>().Key);
+					}
+
+					// Particle effects and a transition as a welcome screen
+					Lights.GetComponent<ParticleController>().Play();
+					foreach (GameObject g in _background)
+					{
+						g.GetComponent<BackgroundController>().New(2);
+					}
 				}
 			});
 
@@ -384,32 +389,67 @@ public class Controller : NetworkBehaviour
 	}
 
 	// Handles pop ups
-	void PopUps()
+	public void PopUps(int i)
 	{
-		// Best time leaderboard
-		if (Input.GetKeyDown(KeyCode.P))
-		{
-			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
-		}
 		// Friends list
-		if (Input.GetKeyDown(KeyCode.L))
+		if (i == 0)
 		{
 			SUGARManager.UserFriend.Display();
 		}
 		// Groups list
-		if (Input.GetKeyDown(KeyCode.O))
+		else if (i == 1)
 		{
 			SUGARManager.UserGroup.Display();
+		}
+		// Achievements list
+		else if (i == 2)
+		{
+			SUGARManager.Evaluation.DisplayAchievementList();
+		}
+		// time leaderboards
+		else if (i == 3)
+		{
+			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Friends);
+		}
+		else if (i == 5)
+		{
+			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
+		}
+		else if (i == 6)
+		{
+			SUGARManager.Leaderboard.Display("longest_time", PlayGen.SUGAR.Common.LeaderboardFilterType.Near);
+		}
+		// score leaderboards
+		else if (i == 7)
+		{
+			SUGARManager.Leaderboard.Display("highest_score", PlayGen.SUGAR.Common.LeaderboardFilterType.Friends);
+		}
+		else if (i == 9)
+		{
+			SUGARManager.Leaderboard.Display("highest_score", PlayGen.SUGAR.Common.LeaderboardFilterType.Top);
+		}
+		else if (i == 10)
+		{
+			SUGARManager.Leaderboard.Display("highest_score", PlayGen.SUGAR.Common.LeaderboardFilterType.Near);
 		}
 	}
 
 	//Reset between games
 	public void GameOver()
 	{
+		// Reset the dodgeball generators
+		foreach (GameObject DBG in DBGS)
+		{
+			DBG.GetComponent<DBGenerator>().Counter = 0;
+			DBG.GetComponent<DBGenerator>().InGame = false;
+		}
 		Selected = -1;
 		Chosen = false;
-		_gameMode[0].GetComponent<ButtonController>().On = false;
-		_gameMode[1].GetComponent<ButtonController>().On = false;
+		if(_gameMode.Length > 0)
+		{
+			_gameMode[0].GetComponent<ButtonController>().On = false;
+			_gameMode[1].GetComponent<ButtonController>().On = false;
+		}
 		_storeLoaded = false;
 		// Show lobby sprites and reset variables
 		if (!SinglePlayer)
@@ -609,14 +649,25 @@ public class Controller : NetworkBehaviour
 			if (SUGARManager.CurrentUser != null)
 			{
 				long score;
+				// In versus send the individual users score
 				if (_mode == 1)
 				{
 					// Get local players score
 					score = Player.ScoreDisplay.GetComponent<PlaceController>().Score;
+					SUGARManager.GameData.Send("score", score);
 				}
+				// In single player send the individual users score
+				else if (SinglePlayer)
+				{
+					score = (long)((int)SharedScore.GetComponent<PlaceController>().Score);
+					SUGARManager.GameData.Send("score", score);
+				}
+				// In coop send the shared score
 				else
 				{
-					score = (long) ((int) SharedScore.GetComponent<PlaceController>().Score / Players.Length);
+					score = (long) ((int) SharedScore.GetComponent<PlaceController>().Score);
+					SUGARManager.GameData.Send("scoreCo", score);
+					score = score / Players.Length;
 				}
 				// Coin cap of 9999999
 				if (score + Requested["coins"] > 9999999)
@@ -629,8 +680,16 @@ public class Controller : NetworkBehaviour
 					GetResource("coins");
 					Debug.Log(success);
 				});
-				// Send the players time as game data for the leaderboards
+				// Send the players time as game data for the leaderboards and achievements
 				SUGARManager.GameData.Send("time", time);
+				// Send the players score as game data for the leaderboards and achievements
+				if (_mode == 2)
+				{
+				}
+				else
+				{
+					SUGARManager.GameData.Send("scoreCo", score);
+				}
 			}
 			// Change the players state so they don't send game data multiple times
 			Player.State = 2;
@@ -651,7 +710,7 @@ public class Controller : NetworkBehaviour
 			GetComponent<WinnerScreen>().Run(Players);
 			if(GameOverCounter == 0)
 			{
-				GameOverCounter = 400;
+				GameOverCounter = 270;
 				Lights.GetComponent<ParticleController>().Play();
 			}
 			else
@@ -667,7 +726,7 @@ public class Controller : NetworkBehaviour
 			}
 		}
 		// Once the game has finished and the end screen has been displayed for enough time return to the lobby
-		if (gameOver && _networkController.Server && GameOverCounter == 0)
+		if (gameOver && GameOverCounter == 0)
 		{
 			if (_networkController.Server)
 			{
@@ -747,18 +806,10 @@ public class Controller : NetworkBehaviour
 		}
 	}
 
-	// Set the value of a resource in the database
-	public void SetResource(string key, float value)
+	// Tell the database you used an ability
+	public void UsedAbility()
 	{
-		// Make sure there is a valid user
-		if (SUGARManager.CurrentUser != null)
-		{
-			// Set resource API call to the database
-			SUGARManager.Resource.Set(key, (long) value, success =>
-			{
-				Debug.Log(success);
-			});
-		}
+		SUGARManager.GameData.Send("ability", 1);
 	}
 }
 

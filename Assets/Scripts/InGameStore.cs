@@ -70,5 +70,26 @@ public class InGameStore : MonoBehaviour {
 		// Set the items to the correct sprites
 		Items[0].GetComponent<SpriteRenderer>().sprite = Sprites[_option[0]];
 		Items[1].GetComponent<SpriteRenderer>().sprite = Sprites[_option[1]];
+		// Scale sprites
+		for(int k = 0; k < Items.Length; k++)
+		{
+			if (_option[k] == 3)
+			{
+				Items[k].transform.localScale = new Vector3(1.0f, 1.0f, 0.4f);
+			}
+			else if (_option[k] == 5)
+			{
+				Items[k].transform.localScale = new Vector3(0.15f, 0.2f, 0.4f);
+
+			}
+			else if (_option[k] == 6)
+			{
+				Items[k].transform.localScale = new Vector3(0.3f, 0.3f, 0.4f);
+			}
+			else
+			{
+				Items[k].transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+			}
+		}
 	}
 }

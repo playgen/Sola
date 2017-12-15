@@ -29,7 +29,10 @@ public class PlayerController : NetworkBehaviour
 		// Assign the players hearts/score to the rankings object so it stays in the top left of the screen
 		Hearts.transform.parent = GameObject.FindGameObjectWithTag("Rankings").transform;
 		// You can buy speed boosts
-		Speed += _controller.Requested["speed"];
+		if(_controller.Requested.ContainsKey("speed"))
+		{
+			Speed += _controller.Requested["speed"];
+		}
 
 		_initialPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
 		_connected = false;
@@ -228,18 +231,22 @@ public class PlayerController : NetworkBehaviour
 	void CollisionHandler (Transform other)
 	{
 		bool hit = false;
-		if(other.tag == "DodgeBall" && isLocalPlayer && other.GetComponent<MeshRenderer>().enabled)
+		// Hit by dodgeball
+		if(other.tag == "DodgeBall" && (isLocalPlayer || !isClient) && other.GetComponent<MeshRenderer>().enabled)
 		{
 			hit = true;
 		}
+		// Hit by blades
 		if (other.tag == "Star" && other.transform.parent != transform && other.transform.parent != transform)
 		{
 			hit = true;
 		}
+		// Hit by explosion
 		if (other.tag == "Explosion")
 		{
 			hit = true;
 		}
+		// Hit by bullet
 		if (other.tag == "Bullet")
 		{
 			if (other.GetComponent<BulletController>().From != transform)
@@ -247,7 +254,7 @@ public class PlayerController : NetworkBehaviour
 				hit = true;
 			}
 		}
-		// Hit by a dodgeball
+		// Hit
 		if (hit)
 		{
 			if (isClient && isLocalPlayer)
@@ -267,8 +274,15 @@ public class PlayerController : NetworkBehaviour
 			}
 		}
 	}
+	
+	//Update in single player game
+	public void Scores(int score)
+	{
+		_controller.SharedScore.GetComponent<PlaceController>().Score += score;
+	}
 
-	//Update scores
+
+	//Update scores on the server
 	[ClientRpc]
 	public void RpcScores(int score)
 	{
@@ -335,23 +349,23 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	// Lets the MoneyChange class talk to the server
-	public void GaveMoney()
+	public void GaveMoney(GameObject player)
 	{
 		if (!isServer)
 		{
-			CmdGave();
+			CmdGave(player);
 		}
 		else
 		{
-			RpcGave();
+			RpcGave(player);
 		}
 	}
 
 	// Tell the server you just gave a user coins
 	[Command]
-	void CmdGave()
+	void CmdGave(GameObject player)
 	{
-		RpcGave();
+		RpcGave(player);
 	}
 
 	// Tell the server the player just hit a ball
@@ -392,9 +406,9 @@ public class PlayerController : NetworkBehaviour
 
 	// Tell the correct user they have just been given 1000 coins
 	[ClientRpc]
-	public void RpcGave()
+	public void RpcGave(GameObject player)
 	{
-		if (isLocalPlayer)
+		if (player.GetComponent<PlayerController>().isLocalPlayer)
 		{
 
 			_controller.Requested.Remove("coins");

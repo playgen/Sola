@@ -128,7 +128,8 @@ public class ZoneController : NetworkBehaviour {
 		}
 		else if (!isClient)
 		{
-			pCont.ScoreDisplay.GetComponent<PlaceController>().Score += 1;
+			// Add to the shared score
+			pCont.Scores(1);
 		}
 		// Change the players colour to indicate they are recieving bonus points
 		foreach (GameObject s in pCont.Stripes)

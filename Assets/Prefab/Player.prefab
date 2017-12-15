@@ -877,7 +877,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dd8fcef198e3614d918e93494f797d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotation: -6
+  rotation: -8
 --- !u!114 &114022686331020138
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -983,7 +983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dd8fcef198e3614d918e93494f797d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotation: 2
+  rotation: 4
 --- !u!114 &114389231459081968
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1109,6 +1109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 1991596580796426}
   Counter: 50
+  Upgraded: 0
 --- !u!135 &135636801606185108
 SphereCollider:
   m_ObjectHideFlags: 1

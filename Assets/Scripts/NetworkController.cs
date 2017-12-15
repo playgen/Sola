@@ -290,9 +290,9 @@ public class NetworkController : NetworkBehaviour {
 
 	// When an ability is used execute it on all clients as well
 	[ClientRpc]
-	public void RpcAbility(GameObject player, float selected, Vector3 mouse, Vector3 regular)
+	public void RpcAbility(GameObject player, float selected, Vector3 mouse, Vector3 regular, bool upgrade)
 	{
-		player.GetComponent<AbilityController>().Ability(selected, mouse, regular);
+		player.GetComponent<AbilityController>().Ability(selected, mouse, regular, upgrade);
 	}
 
 	// Turn on the in game store
@@ -301,4 +301,5 @@ public class NetworkController : NetworkBehaviour {
 	{
 		_controller.IGS.SetActive(true);
 	}
+
 }

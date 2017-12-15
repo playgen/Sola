@@ -12,6 +12,7 @@ public class UpgradeController : MonoBehaviour {
 	public GameObject Chest, Controller, Store, Single, Online, Back;
 	public bool InGameStore;
 
+	Controller _controller;
 	GameObject[] _values;
 	Upgrade[] _buttons;
 	float _wealth, _price, _oldWealth, _oldPrice;
@@ -22,6 +23,7 @@ public class UpgradeController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
+		_controller = Controller.GetComponent<Controller>();
 		// Get all the buttons in the shop
 		_buttons = GetComponentsInChildren<Upgrade>();
 		_values = new GameObject[Positions.Length];
@@ -63,16 +65,16 @@ public class UpgradeController : MonoBehaviour {
 	void Dictionary()
 	{
 		// Get the amount of coins
-		if (Controller.GetComponent<Controller>().Requested.ContainsKey("coins"))
+		if (_controller.Requested.ContainsKey("coins"))
 		{
-			_wealth = Controller.GetComponent<Controller>().Requested["coins"];
+			_wealth = _controller.Requested["coins"];
 		}
 		// Get the value of each of the buttons
 		foreach (Upgrade up in _buttons)
 		{
-			if (Controller.GetComponent<Controller>().Requested.ContainsKey(up.Key))
+			if (_controller.Requested.ContainsKey(up.Key))
 			{
-				float value = Controller.GetComponent<Controller>().Requested[up.Key];
+				float value = _controller.Requested[up.Key];
 				if (value != 0)
 				{
 					int position = up.Previous.Length;
@@ -93,9 +95,9 @@ public class UpgradeController : MonoBehaviour {
 		if (up.Pressed == true && _wealth >= _price)
 		{
 			// Update wealth
-			Controller.GetComponent<Controller>().Requested.Remove("coins");
-			Controller.GetComponent<Controller>().AddResource("coins", -_price);
-			Controller.GetComponent<Controller>().GetResource("coins");
+			_controller.Requested.Remove("coins");
+			_controller.AddResource("coins", -_price);
+			_controller.GetResource("coins");
 
 			// If it is a multi tiered item then buy the previous versions as well
 			int amount = 1;
@@ -114,8 +116,8 @@ public class UpgradeController : MonoBehaviour {
 			if (_price > 0)
 			{
 				// Update the database and the dictionary
-				Controller.GetComponent<Controller>().AddResource(up.Key, amount);
-				Controller.GetComponent<Controller>().GetResource(up.Key);
+				_controller.AddResource(up.Key, amount);
+				_controller.GetResource(up.Key);
 				up.Bought = true;
 			}
 		}
@@ -194,7 +196,7 @@ public class UpgradeController : MonoBehaviour {
 	// Numbers animation. Whenever a number is updated it rotates it and replaces it with the updated value
 	void FlipNumbers(int start, int end, string comparison, bool flip)
 	{
-		
+
 		//It will cut off at 7 digit
 		for (int i = start; i < end; i++)
 		{
@@ -248,19 +250,16 @@ public class UpgradeController : MonoBehaviour {
 				{
 					for (int j = 0; j < 8; j++)
 					{
-						if (!InGameStore)
+						SpriteRenderer[] sprites = _values[i].transform.GetComponentsInChildren<SpriteRenderer>();
+						foreach (SpriteRenderer s in sprites)
 						{
-							SpriteRenderer[] sprites = _values[i].transform.GetComponentsInChildren<SpriteRenderer>();
-							foreach (SpriteRenderer s in sprites)
+							if (Int32.Parse(_wealthString) >= 0)
 							{
-								if (Int32.Parse(_wealthString) > 0)
-								{
-									s.sprite = NumberSprite[1];
-								}
-								else
-								{
-									s.sprite = NumberSprite[2];
-								}
+								s.sprite = NumberSprite[1];
+							}
+							else
+							{
+								s.sprite = NumberSprite[2];
 							}
 						}
 					}

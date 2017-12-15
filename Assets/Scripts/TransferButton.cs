@@ -39,6 +39,7 @@ public class TransferButton : MonoBehaviour {
 		{
 			GetComponent<SpriteRenderer>().sprite = Sprites[0];
 		}
+		_hovered = false;
 	}
 
 

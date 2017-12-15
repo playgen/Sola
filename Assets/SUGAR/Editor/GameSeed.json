@@ -1,0 +1,160 @@
+{
+  "game": "Dodgeball",
+  "achievements": [
+    {
+      "Token": "100_seconds",
+      "GameId": null,
+      "Name": "100 Seconds",
+      "Description": "Last 100 Seconds",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "time",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Latest",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "100"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "100000"
+        }
+      ]
+    },
+    {
+      "Token": "10_minutes",
+      "GameId": null,
+      "Name": "10 Minutes",
+      "Description": "Play for a total of 10 minutes",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "time",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Sum",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "600"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "60000"
+        }
+      ]
+    },
+    {
+      "Token": "abilities",
+      "GameId": null,
+      "Name": "Abilities",
+      "Description": "Use 100 Abilities",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "ability",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Sum",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "100"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "30000"
+        }
+      ]
+    },
+    {
+      "Token": "20000",
+      "GameId": null,
+      "Name": "20000 Points",
+      "Description": "Get 20'000 Points in VS or Single Player",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "score",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Latest",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "20000"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "40000"
+        }
+      ]
+    },
+    {
+      "Token": "100000",
+      "GameId": null,
+      "Name": "100000 Points",
+      "Description": "Get 100'000 Points in co-op",
+      "ActorType": "User",
+      "EvaluationCriterias": [
+        {
+          "EvaluationDataKey": "scoreCo",
+          "EvaluationDataCategory": "GameData",
+          "EvaluationDataType": "Float",
+          "CriteriaQueryType": "Latest",
+          "ComparisonType": "GreaterOrEqual",
+          "Scope": "Actor",
+          "Value": "100000"
+        }
+      ],
+      "Rewards": [
+        {
+          "EvaluationDataKey": "coins",
+          "EvaluationDataCategory": "Resource",
+          "EvaluationDataType": "Float",
+          "Value": "150000"
+        }
+      ]
+    }
+  ],
+  "skills": [],
+  "leaderboards": [
+    {
+      "Token": "highest_score",
+      "GameId": null,
+      "Name": "Score",
+      "EvaluationDataCategory": "GameData",
+      "Key": "score",
+      "ActorType": "User",
+      "EvaluationDataType": "Long",
+      "CriteriaScope": "Actor",
+      "LeaderboardType": "Highest"
+    },
+    {
+      "Token": "longest_time",
+      "GameId": null,
+      "Name": "Duration",
+      "EvaluationDataCategory": "GameData",
+      "Key": "time",
+      "ActorType": "User",
+      "EvaluationDataType": "Float",
+      "CriteriaScope": "Actor",
+      "LeaderboardType": "Highest"
+    }
+  ]
+}

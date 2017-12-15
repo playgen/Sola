@@ -2873,6 +2873,8 @@ MonoBehaviour:
   _topButton: {fileID: 114000014254748628}
   _nearButton: {fileID: 114000012687604838}
   _friendsButton: {fileID: 114000010306375208}
+  _membersButton: {fileID: 0}
+  _alliancesButton: {fileID: 0}
   _leaderboardPositions:
   - {fileID: 114000011828146538}
   - {fileID: 114000012116299056}
@@ -2886,7 +2888,6 @@ MonoBehaviour:
   - {fileID: 114000014231298928}
   _previousButton: {fileID: 114000010758246850}
   _nextButton: {fileID: 114000010013943934}
-  _pageNumberText: {fileID: 114000011008003046}
 --- !u!114 &114000013215278996
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3046,7 +3047,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8980392, g: 0, b: 0.49411765, a: 1}
+  m_Color: {r: 0, g: 0, b: 0.49411765, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
