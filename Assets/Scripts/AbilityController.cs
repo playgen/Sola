@@ -26,7 +26,25 @@ public class AbilityController : NetworkBehaviour
 	
 	// FixedUpdate is called once per frame
 	void FixedUpdate ()
-	{       
+	{
+		// Reset the players speed and size to normal
+		if (_resizeCounter > 0)
+		{
+			_resizeCounter--;
+			if (_resizeCounter == 0)
+			{
+				if (_upgraded)
+				{
+					_upgraded = false;
+					GetComponent<PlayerController>().Speed = GetComponent<PlayerController>().Speed / 2.0f;
+				}
+				else
+				{
+					GetComponent<PlayerController>().Speed = GetComponent<PlayerController>().Speed / 1.4f;
+				}
+				transform.localScale = new Vector3(0.4f, 0.4f, 0.1f);
+			}
+		}
 		// If this is not the local player ignore the rest of the script
 		if (!isLocalPlayer && !_controller.SinglePlayer)
 		{
@@ -58,24 +76,6 @@ public class AbilityController : NetworkBehaviour
 		if (_spinCounter >= 0)
 		{
 			_spinCounter--;
-		}
-		// Reset the players speed and size to normal
-		if (_resizeCounter > 0)
-		{
-			_resizeCounter--;
-			if(_resizeCounter == 0)
-			{
-				if(_upgraded)
-				{
-					_upgraded = false;
-					GetComponent<PlayerController>().Speed = GetComponent<PlayerController>().Speed / 2.0f;
-				}
-				else
-				{
-					GetComponent<PlayerController>().Speed = GetComponent<PlayerController>().Speed / 1.4f;
-				}
-				transform.localScale = new Vector3(0.4f, 0.4f, 0.1f);
-			}
 		}
 
 		// Ability cooldown/ displayed timer
