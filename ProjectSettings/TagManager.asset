@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - OuterWall
+  - NetworkManager
+  - Controller
+  - Background
+  - One
+  - Two
+  - Three
+  - Wait
+  - Host
+  - NetworkController
+  - DodgeBall
+  - Rankings
+  - DBGenerator
+  - Scale
+  - Shop
+  - DBSGenerator
+  - Star
+  - Explosion
+  - Bullet
+  - Zone
+  - Mode
+  - Health
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
