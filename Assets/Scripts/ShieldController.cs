@@ -17,6 +17,7 @@ public class ShieldController : MonoBehaviour {
 	
 	// Stay active until the counter runs out
 	void FixedUpdate () {
+		// Last longer if it is the upgraded version
 		if(Upgraded > 0)
 		{
 			Upgraded--;

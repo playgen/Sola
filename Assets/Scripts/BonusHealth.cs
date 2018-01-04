@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Controller for the Health item. Exists whilst the counter is not 0
+// Controller for the Health pickup that players with the health ability can spawn
+// Exists whilst the counter is not 0
 public class BonusHealth : MonoBehaviour
 {
 	public GameObject Player;

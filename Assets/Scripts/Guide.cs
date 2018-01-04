@@ -11,9 +11,8 @@ public class Guide : MonoBehaviour {
 		
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate () {
-		// When you press a button go to the next page of the guide
+		// When you press a button go to the second page of the guide
 		if (_right && transform.localPosition.x > -20.0f)
 		{
 			transform.localPosition = new Vector3(transform.localPosition.x - 0.5f, 0.0f, 0.0f);

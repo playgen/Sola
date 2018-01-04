@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+// Controller for a block in the game. These are zones that the players cannot pass through
+// Players can however blink over them
 public class BlockController : NetworkBehaviour {
 
 	public float activated;

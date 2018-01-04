@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class Controller : NetworkBehaviour
 {
-	public GameObject Wait, Host, Tab, Dots, Text, NetController, Rankings, PlayerOffline, Ability, Lights, SharedScore, Request, Gain, IGS;
+	public GameObject Wait, Host, Tab, Dots, Text, NetController, Rankings, PlayerOffline, Ability, Lights, SharedScore, Gain, IGS;
 	public GameObject[] Players, Buttons, DBGS, Countdown, Zones, CoinArrows;
 	public PlayerController Player;
 
@@ -50,10 +50,6 @@ public class Controller : NetworkBehaviour
 	// Update is called once per frame
 	void FixedUpdate()
 	{
-		if (Input.GetKey(KeyCode.B))
-		{
-			AddResource("coins", -100000);
-		}
 		// Once you have selected an item hide the store menu
 		if (Selected != -1)
 		{
@@ -151,8 +147,9 @@ public class Controller : NetworkBehaviour
 					}
 				}
 			}
+			Debug.Log(Chosen);
 			// Initialise the store to match the game mode
-			if (!_storeLoaded)
+			if (!_storeLoaded && (Chosen || SinglePlayer))
 			{
 				_storeLoaded = true;
 				if (SinglePlayer)
@@ -176,10 +173,6 @@ public class Controller : NetworkBehaviour
 			if (SinglePlayer && Selected == -1)
 			{
 				IGS.SetActive(true);
-			}
-			if(!SinglePlayer)
-			{
-				Request.SetActive(true);
 			}
 			// Only need to get the local player once
 			if(Player == null)
@@ -281,7 +274,6 @@ public class Controller : NetworkBehaviour
 					_networkController.RpcStore();
 					_storeLoaded = false;
 					one.Pressed = false;
-					Chosen = true;
 					one.On = true;
 				}
 				if (two.Pressed)
@@ -289,7 +281,6 @@ public class Controller : NetworkBehaviour
 					_networkController.RpcStore();
 					_storeLoaded = false;
 					two.Pressed = false;
-					Chosen = true;
 					two.On = true;
 				}
 			}
@@ -302,9 +293,13 @@ public class Controller : NetworkBehaviour
 			{
 				_mode = 2;
 			}
+			if(one.On || two.On)
+			{
+				Chosen = true;
+			}
 		}
 		// Single player
-		else
+		else if (SinglePlayer)
 		{
 			_mode = 2;
 		}
@@ -320,7 +315,6 @@ public class Controller : NetworkBehaviour
 			if (StartCounter == 61)
 			{
 				IGS.SetActive(false);
-				Request.SetActive(false);
 				// If its a co-op or single player game turn on the big score counter
 				if (_mode == 2)
 				{
@@ -452,10 +446,6 @@ public class Controller : NetworkBehaviour
 		}
 		_storeLoaded = false;
 		// Show lobby sprites and reset variables
-		if (!SinglePlayer)
-		{
-			Request.SetActive(true);
-		}
 		StartCounter = -1;
 		_running = false;
 		Started = false;
@@ -521,7 +511,6 @@ public class Controller : NetworkBehaviour
 
 		// Hide all the sprites
 		IGS.SetActive(false);
-		Request.SetActive(false);
 		Countdown[0].SetActive(false);
 		Countdown[1].SetActive(false);
 		Countdown[2].SetActive(false);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//Controller for the background cubes/ Transitions
+//Controller for the Background Cubes/ Transitions
 public class BackgroundController : MonoBehaviour {
 
 	public float X;

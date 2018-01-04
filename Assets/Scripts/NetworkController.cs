@@ -37,7 +37,6 @@ public class NetworkController : NetworkBehaviour {
 		_temp = 0.0f;
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate ()
 	{
 		// Is this instance a server and/or a client
@@ -158,7 +157,7 @@ public class NetworkController : NetworkBehaviour {
 				// 3, 4, 5, 6. Its rotation, Position and size
 				// 7, 8. The furthest it can rotate
 				// 9. Its current state (Waiting, Charging, Fired)
-				// 10, 11. The balls rotation and regular speed
+				// 10, 11. The balls rotation Speed and movement speed
 				// 12. If it is a special ball and if so which kind
 				DodgeController ball = _updatedBalls[q].GetComponentInChildren<DodgeController>();
 				_updates[i + 0] = (float) q;

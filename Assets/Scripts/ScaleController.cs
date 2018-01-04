@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// This class is attached to the camera. It scales the camera dependant on the Aspect ratio
+// This class is attached to the camera. It scales the camera depending on the Aspect ratio
 public class ScaleController : MonoBehaviour {
 
 	float _ratio, _initial;

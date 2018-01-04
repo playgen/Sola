@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-//using PlayGen.SUGAR.Unity;
+using PlayGen.SUGAR.Unity;
 
+// Controller for an individual player
+// Unless it is the local player most of this script is ignored
 public class PlayerController : NetworkBehaviour
 {
 	public float Speed, Time;
@@ -62,13 +64,18 @@ public class PlayerController : NetworkBehaviour
 		{
 			RpcColour(_colour);
 		}
+		// Versus
 		if (Mode == 1)
 		{
+			// Show individual score and hide player marker
 			ScoreDisplay.SetActive(true);
 			Marker.SetActive(false);
 		}
+		// Single Player / CO-OP
 		else
 		{
+			// Hide individual score and show player marker
+			// There is only 1 score at the top of the screen for these game modes
 			ScoreDisplay.SetActive(false);
 			Marker.SetActive(true);
 			Marker.GetComponent<SpriteRenderer>().sprite = MarkerSprites[_colour];
@@ -228,6 +235,8 @@ public class PlayerController : NetworkBehaviour
 		CollisionHandler(other.transform);
 	}
 
+
+	// Handles collisions between the player and other objects
 	void CollisionHandler (Transform other)
 	{
 		bool hit = false;

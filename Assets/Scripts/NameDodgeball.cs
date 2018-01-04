@@ -13,7 +13,7 @@ public class NameDodgeball : MonoBehaviour {
 	
 	// Move around the title
 	void FixedUpdate () {
-		transform.localPosition = new Vector3(0.0f, transform.localPosition.y +_movement, transform.localPosition.z);
+		transform.localPosition = new Vector3(0.0f, transform.localPosition.y + _movement, transform.localPosition.z);
 
 		// Move infront of the title bar
 		if(transform.localPosition.y < -6.0)

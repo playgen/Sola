@@ -65,7 +65,7 @@ public class SingleController : MonoBehaviour {
 		}
 	}
 
-	// Call the resetPlayer method in the playerController script
+	// Call ResetPlayer method in the playerController script
 	public void Resets()
 	{
 		_player.GetComponent<PlayerController>().ResetPlayer();

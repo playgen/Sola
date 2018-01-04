@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
+// Ability controller for an individual player
 public class AbilityController : NetworkBehaviour
 {
 	public GameObject Spin, Shield, Bomb, Bullet, Health;
@@ -24,7 +26,7 @@ public class AbilityController : NetworkBehaviour
 		_spinCounter = -1;
 	}
 	
-	// FixedUpdate is called once per frame
+	// If E is pressed and it is the local player connected to this script use an ability
 	void FixedUpdate ()
 	{
 		// Reset the players speed and size to normal
@@ -386,6 +388,7 @@ public class AbilityController : NetworkBehaviour
 		GameObject.FindGameObjectWithTag("NetworkController").GetComponent<NetworkController>().RpcAbility(gameObject, selected, mouse, regular, upgrade);
 	}
 
+	// Check if an ability has been upgraded
 	bool Upgraded(int selected)
 	{
 		if(selected == 0)

@@ -27,7 +27,7 @@ public class ScrollController : MonoBehaviour {
 				Direction = 0.0f;
 			}
 		}
-		// For the Scrolling text
+		// For the scrolling text
 		else
 		{
 			transform.localPosition = new Vector3(transform.localPosition.x + Direction, transform.localPosition.y, transform.localPosition.z);

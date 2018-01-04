@@ -52,7 +52,7 @@ public class DodgeController : MonoBehaviour
 		}
 	}
 
-	// Main code for the dodgeball
+	// Main code for a dodgeball
 	void FixedUpdate()
 	{
 		// Find a list of all the players

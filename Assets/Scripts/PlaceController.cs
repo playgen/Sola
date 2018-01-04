@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// IDisplays the players score throughout the game and in the end screen
+// Displays the players score throughout the game and in the end screen
 public class PlaceController : MonoBehaviour {
 
 	public GameObject Position, Dash, Player;
@@ -19,7 +19,7 @@ public class PlaceController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// Original height
+		// Original position(y)
 		_original = transform.localPosition.y;
 		// If its a script for the end screen hide the gameobject until the game ends
 		if(EndPodium)

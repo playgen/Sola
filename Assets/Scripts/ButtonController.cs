@@ -24,7 +24,7 @@ public class ButtonController : NetworkBehaviour
 	
 	void FixedUpdate()
 	{
-		// Whilst the mouse is over the button display the correct Sprite/Material or it is forced on
+		// Whilst the mouse is over the button or the button is On display the correct Sprite/Material
 		if ((_hovered && !Network) || On)
 		{
 			if (Sprite)

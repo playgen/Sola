@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// This class controls the end game screen. Assigns the players times to the podium game obhects and sets them active
+// This class controls the end game screen. Assigns the players times to the podium game objects and sets them active
 public class WinnerScreen : MonoBehaviour {
 
 	public GameObject[] Podiums;

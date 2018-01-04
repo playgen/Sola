@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-// Controller for a players health bar
+// Controller for a Players health bar
 public class HeartController : MonoBehaviour {
 
 	public GameObject[] Hearts = new GameObject[5];
